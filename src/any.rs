@@ -1,0 +1,35 @@
+use crate::atoms::KItem;
+use crate::raw::kapi;
+use crate::raw::types::K;
+use std::mem;
+
+/// KAny wraps the core K type safely. It can be converted into more specific wrappers
+/// that offer proper functionality using standard rust conversions (TryFrom).
+pub struct KAny(pub(crate) *const K);
+
+impl KAny {
+    pub fn into_ptr(self) -> *const K {
+        mem::ManuallyDrop::new(self).as_k_ptr()
+    }
+}
+
+impl KItem for KAny {
+    fn as_k_ptr(&self) -> *const K {
+        self.0
+    }
+}
+
+impl PartialEq for KAny {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        unsafe { *self.0 == *other.0 }
+    }
+}
+
+impl Drop for KAny {
+    fn drop(&mut self) {
+        unsafe {
+            kapi::r0(self.0);
+        }
+    }
+}

@@ -13,6 +13,7 @@ use crate::raw::kapi;
 use crate::raw::types::*;
 use std::convert::TryFrom;
 use std::ffi::CString;
+use std::fmt;
 use std::iter::FromIterator;
 use std::mem;
 use std::ops;
@@ -81,6 +82,12 @@ macro_rules! impl_klist {
 
             pub fn new() -> Self {
                 unsafe{ $type(kapi::ktn($list_type.into(), 0)) }
+            }
+        }
+
+        impl fmt::Debug for $type {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                fmt::Debug::fmt(&**self, f)
             }
         }
 

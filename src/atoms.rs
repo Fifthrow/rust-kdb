@@ -4,6 +4,7 @@ use crate::raw::kapi;
 use crate::raw::types::*;
 use std::convert::TryFrom;
 use std::ffi::{CStr, CString, NulError};
+use std::fmt;
 use std::mem;
 
 pub trait KItem {
@@ -65,6 +66,12 @@ macro_rules! impl_katom {
                     } else {
                         Err(ConversionError::InvalidKCast{ from: t, to: $any_wrapper })
                     }
+            }
+        }
+
+        impl fmt::Debug for $type {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                fmt::Debug::fmt(&**self, f)
             }
         }
 

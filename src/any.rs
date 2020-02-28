@@ -13,9 +13,12 @@ impl KAny {
     }
 }
 
-impl KItem for KAny {
-    fn as_k_ptr(&self) -> *const K {
+    pub fn as_k_ptr(&self) -> *const K {
         self.0
+    }
+
+    pub fn k_type(&self) -> KType {
+        unsafe { (*self.as_k_ptr()).t }
     }
 }
 

@@ -48,10 +48,11 @@ pub trait KListItem: KItem {
 }
 
 macro_rules! impl_klist {
-    {$type:ident, ListType = $list_type:ident, Item = $item:ty, Joiner = $joiner:ident} => {
+    {$type:ident, KType = $k_type:ident, Item = $item:ty, Joiner = $joiner:ident} => {
         pub struct $type(* const K);
 
         impl KItem for $type {
+            const K_TYPE: KType = $k_type;
             fn as_k_ptr(&self) -> * const K { self.0 }
         }
 
@@ -81,7 +82,7 @@ macro_rules! impl_klist {
             }
 
             pub fn new() -> Self {
-                unsafe{ $type(kapi::ktn($list_type.into(), 0)) }
+                unsafe{ $type(kapi::ktn($k_type.into(), 0)) }
             }
         }
 
@@ -132,15 +133,9 @@ macro_rules! impl_klist {
             }
         }
 
-        impl From<$type> for Vec<$item> {
-            fn from(k_list: $type) -> Vec<$item> {
-                k_list.iter().copied().collect()
-            }
-        }
-
         impl FromIterator<$item> for $type {
             fn from_iter<I: IntoIterator<Item=$item>>(iter: I) -> Self {
-                $type(list($list_type, iter, |mut k, item| {
+                $type(list($k_type, iter, |mut k, item| {
                     unsafe {
                         kapi::$joiner(&mut k, &item as *const _ as *const _)  as *mut K
                     }
@@ -150,7 +145,7 @@ macro_rules! impl_klist {
 
         impl<'a> FromIterator<&'a $item> for $type {
             fn from_iter<I: IntoIterator<Item=&'a $item>>(iter: I) -> Self {
-                $type(list($list_type, iter, |mut k, item| {
+                $type(list($k_type, iter, |mut k, item| {
                     unsafe {
                         kapi::$joiner(&mut k, item as *const _ as *const _)  as *mut K
                     }
@@ -171,32 +166,32 @@ macro_rules! impl_klist {
 
             fn try_from(any: KAny) -> Result<Self, Self::Error> {
                     let t = any.k_type();
-                    if t == $list_type {
+                    if t == $k_type {
                         Ok(unsafe { mem::transmute(any) })
                     } else {
-                        Err(ConversionError::InvalidKCast{ from: t, to: $list_type })
+                        Err(ConversionError::InvalidKCast{ from: t, to: $k_type })
                     }
             }
         }
     }
 }
 
-impl_klist! {KByteList, ListType = BYTE_LIST, Item = u8, Joiner = ja}
-impl_klist! {KCharList, ListType = CHAR_LIST, Item = i8, Joiner = ja}
-impl_klist! {KShortList, ListType = SHORT_LIST, Item = i16, Joiner = ja}
-impl_klist! {KIntList, ListType = INT_LIST, Item = i32, Joiner = ja}
-impl_klist! {KLongList, ListType = LONG_LIST, Item = i64, Joiner = ja}
-impl_klist! {KRealList, ListType = REAL_LIST, Item = f32, Joiner = ja}
-impl_klist! {KFloatList, ListType = FLOAT_LIST, Item = f64, Joiner = ja}
-impl_klist! {KBooleanList, ListType = BOOLEAN_LIST, Item = bool, Joiner = ja}
-impl_klist! {KSecondList, ListType = SECOND_LIST, Item = KSecond, Joiner = ja}
-impl_klist! {KMinuteList, ListType = MINUTE_LIST, Item = KMinute, Joiner = ja}
-impl_klist! {KMonthList, ListType = MONTH_LIST, Item = KMonth, Joiner = ja}
-impl_klist! {KTimeList, ListType = TIME_LIST, Item = KTime, Joiner = ja}
-impl_klist! {KDateList, ListType = DATE_LIST, Item = KDate, Joiner = ja}
-impl_klist! {KDateTimeList, ListType = DATE_TIME_LIST, Item = KDateTime, Joiner = ja}
-impl_klist! {KSymbolList, ListType = SYMBOL_LIST, Item = KSymbol, Joiner = js}
-impl_klist! {KGuidList, ListType = GUID_LIST, Item = KGuid, Joiner = ja }
+impl_klist! {KByteList, KType = BYTE_LIST, Item = u8, Joiner = ja}
+impl_klist! {KCharList, KType = CHAR_LIST, Item = i8, Joiner = ja}
+impl_klist! {KShortList, KType = SHORT_LIST, Item = i16, Joiner = ja}
+impl_klist! {KIntList, KType = INT_LIST, Item = i32, Joiner = ja}
+impl_klist! {KLongList, KType = LONG_LIST, Item = i64, Joiner = ja}
+impl_klist! {KRealList, KType = REAL_LIST, Item = f32, Joiner = ja}
+impl_klist! {KFloatList, KType = FLOAT_LIST, Item = f64, Joiner = ja}
+impl_klist! {KBooleanList, KType = BOOLEAN_LIST, Item = bool, Joiner = ja}
+impl_klist! {KSecondList, KType = SECOND_LIST, Item = KSecond, Joiner = ja}
+impl_klist! {KMinuteList, KType = MINUTE_LIST, Item = KMinute, Joiner = ja}
+impl_klist! {KMonthList, KType = MONTH_LIST, Item = KMonth, Joiner = ja}
+impl_klist! {KTimeList, KType = TIME_LIST, Item = KTime, Joiner = ja}
+impl_klist! {KDateList, KType = DATE_LIST, Item = KDate, Joiner = ja}
+impl_klist! {KDateTimeList, KType = DATE_TIME_LIST, Item = KDateTime, Joiner = ja}
+impl_klist! {KSymbolList, KType = SYMBOL_LIST, Item = KSymbol, Joiner = js}
+impl_klist! {KGuidList, KType = GUID_LIST, Item = KGuid, Joiner = ja }
 
 impl FromIterator<String> for KSymbolList {
     fn from_iter<I: IntoIterator<Item = String>>(iter: I) -> Self {

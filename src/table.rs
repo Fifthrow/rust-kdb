@@ -3,7 +3,7 @@ use crate::atoms::KItem;
 use crate::dict::KDict;
 use crate::error::ConversionError;
 use crate::raw::kapi;
-use crate::raw::types::{K, TABLE};
+use crate::raw::types::{KType, K, TABLE};
 use std::convert::TryFrom;
 use std::mem;
 
@@ -24,6 +24,7 @@ impl KTable {
 }
 
 impl KItem for KTable {
+    const K_TYPE: KType = TABLE;
     fn as_k_ptr(&self) -> *const K {
         self.0
     }

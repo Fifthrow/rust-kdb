@@ -11,6 +11,7 @@ use std::ops::Index;
 pub struct KDict(*const K);
 
 impl KItem for KDict {
+    const K_TYPE: KType = DICT;
     fn as_k_ptr(&self) -> *const K {
         self.0
     }

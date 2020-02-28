@@ -8,6 +8,7 @@ use std::fmt;
 use std::mem;
 
 pub trait KItem {
+    const K_TYPE: KType;
     fn as_k_ptr(&self) -> *const K;
 
     fn clone_k_ptr(&self) -> *const K {
@@ -25,10 +26,11 @@ pub struct InvalidKCastError {
 }
 
 macro_rules! impl_katom {
-    {$type:ident, AtomType = $atom_type:ident, AnyWrapper = $any_wrapper:ident, Ctor = $ctor:ident, Accessor: $accessor:ident } => {
+    {$type:ident, AtomType = $atom_type:ident, KType = $k_type:ident, Ctor = $ctor:ident, Accessor: $accessor:ident } => {
         pub struct $type(* const K);
 
         impl KItem for $type {
+            const K_TYPE: KType = $k_type;
             fn as_k_ptr(&self) -> * const K { self.0 }
         }
 
@@ -60,12 +62,12 @@ macro_rules! impl_katom {
             type Error = ConversionError;
 
             fn try_from(any: KAny) -> Result<Self, Self::Error> {
-                    let t = any.k_type();
-                    if t == $any_wrapper {
-                        Ok(unsafe { mem::transmute(any) })
-                    } else {
-                        Err(ConversionError::InvalidKCast{ from: t, to: $any_wrapper })
-                    }
+                let t = any.k_type();
+                if t == $k_type {
+                    Ok(unsafe { mem::transmute(any) })
+                } else {
+                    Err(ConversionError::InvalidKCast{ from: t, to: $k_type })
+                }
             }
         }
 
@@ -92,22 +94,22 @@ macro_rules! impl_katom {
     }
 }
 
-impl_katom! {KByteAtom, AtomType = u8, AnyWrapper = BYTE_ATOM, Ctor = kg, Accessor: g }
-impl_katom! {KCharAtom, AtomType = i8, AnyWrapper = CHAR_ATOM, Ctor = kc, Accessor: c }
-impl_katom! {KShortAtom, AtomType = i16, AnyWrapper = SHORT_ATOM, Ctor = kh, Accessor: h }
-impl_katom! {KIntAtom, AtomType = i32, AnyWrapper = INT_ATOM, Ctor = ki, Accessor: i }
-impl_katom! {KLongAtom, AtomType = i64, AnyWrapper = LONG_ATOM, Ctor = kj, Accessor: j }
-impl_katom! {KRealAtom, AtomType = f32, AnyWrapper = REAL_ATOM, Ctor = ke, Accessor: e }
-impl_katom! {KFloatAtom, AtomType = f64, AnyWrapper = FLOAT_ATOM, Ctor = kf, Accessor: f }
-impl_katom! {KBoolAtom, AtomType = bool, AnyWrapper = BOOLEAN_ATOM, Ctor = kg, Accessor: bl }
-impl_katom! {KSecondAtom, AtomType = KSecond, AnyWrapper = SECOND_ATOM, Ctor = ki, Accessor: sec }
-impl_katom! {KMinuteAtom, AtomType = KMinute, AnyWrapper = MINUTE_ATOM, Ctor = ki, Accessor: min }
-impl_katom! {KMonthAtom, AtomType = KMonth, AnyWrapper = MONTH_ATOM, Ctor = ki, Accessor: m }
-impl_katom! {KTimeAtom, AtomType = KTime, AnyWrapper = TIME_ATOM, Ctor = ki, Accessor: t }
-impl_katom! {KDateAtom, AtomType = KDate, AnyWrapper = DATE_ATOM, Ctor = ki, Accessor: d }
-impl_katom! {KDateTimeAtom, AtomType = KDateTime, AnyWrapper = DATE_TIME_ATOM, Ctor = kf, Accessor: dt }
-impl_katom! {KSymbolAtom, AtomType = KSymbol, AnyWrapper = SYMBOL_ATOM, Ctor = ks, Accessor: sym }
-impl_katom! {KGuidAtom, AtomType = KGuid, AnyWrapper = GUID_ATOM, Ctor = ku, Accessor: u }
+impl_katom! {KByteAtom, AtomType = u8, KType = BYTE_ATOM, Ctor = kg, Accessor: g }
+impl_katom! {KCharAtom, AtomType = i8, KType = CHAR_ATOM, Ctor = kc, Accessor: c }
+impl_katom! {KShortAtom, AtomType = i16, KType = SHORT_ATOM, Ctor = kh, Accessor: h }
+impl_katom! {KIntAtom, AtomType = i32, KType = INT_ATOM, Ctor = ki, Accessor: i }
+impl_katom! {KLongAtom, AtomType = i64, KType = LONG_ATOM, Ctor = kj, Accessor: j }
+impl_katom! {KRealAtom, AtomType = f32, KType = REAL_ATOM, Ctor = ke, Accessor: e }
+impl_katom! {KFloatAtom, AtomType = f64, KType = FLOAT_ATOM, Ctor = kf, Accessor: f }
+impl_katom! {KBoolAtom, AtomType = bool, KType = BOOLEAN_ATOM, Ctor = kg, Accessor: bl }
+impl_katom! {KSecondAtom, AtomType = KSecond, KType = SECOND_ATOM, Ctor = ki, Accessor: sec }
+impl_katom! {KMinuteAtom, AtomType = KMinute, KType = MINUTE_ATOM, Ctor = ki, Accessor: min }
+impl_katom! {KMonthAtom, AtomType = KMonth, KType = MONTH_ATOM, Ctor = ki, Accessor: m }
+impl_katom! {KTimeAtom, AtomType = KTime, KType = TIME_ATOM, Ctor = ki, Accessor: t }
+impl_katom! {KDateAtom, AtomType = KDate, KType = DATE_ATOM, Ctor = ki, Accessor: d }
+impl_katom! {KDateTimeAtom, AtomType = KDateTime, KType = DATE_TIME_ATOM, Ctor = kf, Accessor: dt }
+impl_katom! {KSymbolAtom, AtomType = KSymbol, KType = SYMBOL_ATOM, Ctor = ks, Accessor: sym }
+impl_katom! {KGuidAtom, AtomType = KGuid, KType = GUID_ATOM, Ctor = ku, Accessor: u }
 
 //Extra convenience conversions implemented manually
 impl TryFrom<&str> for KSymbolAtom {
@@ -136,6 +138,7 @@ impl TryFrom<KSymbolAtom> for String {
 pub struct KError(pub(crate) *const K);
 
 impl KItem for KError {
+    const K_TYPE: KType = ERROR;
     fn as_k_ptr(&self) -> *const K {
         self.0
     }

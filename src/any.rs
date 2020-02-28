@@ -4,11 +4,12 @@ use crate::raw::types::K;
 use std::mem;
 
 /// KAny wraps the core K type safely. It can be converted into more specific wrappers
-/// that offer proper functionality using standard rust conversions (TryFrom).
+/// that offer more useful functionality using standard rust conversions (TryFrom) or
+/// checked reference conversions (the try_as_ref method)
 pub struct KAny(pub(crate) *const K);
 
 impl KAny {
-    pub fn into_ptr(self) -> *const K {
+    pub(crate) fn into_ptr(self) -> *const K {
         mem::ManuallyDrop::new(self).as_k_ptr()
     }
 }

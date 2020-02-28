@@ -11,8 +11,8 @@ pub trait KItem {
     const K_TYPE: KType;
     fn as_k_ptr(&self) -> *const K;
 
-    fn clone_k_ptr(&self) -> *const K {
-        unsafe { kapi::r1(self.as_k_ptr()) }
+    unsafe fn clone_k_ptr(&self) -> *const K {
+        kapi::r1(self.as_k_ptr())
     }
 
     fn k_type(&self) -> KType {

@@ -43,6 +43,12 @@ macro_rules! impl_katom {
             }
         }
 
+        impl From<$atom_type> for KAny {
+            fn from(value: $atom_type) -> KAny {
+                unsafe { KAny((kapi::$ctor(value.into()))) }
+            }
+        }
+
         impl From<$type> for KAny {
             fn from(item: $type) -> KAny {
                 unsafe { mem::transmute(item) }

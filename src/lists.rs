@@ -101,28 +101,35 @@ macro_rules! impl_klist {
         impl ops::Index<ops::RangeFrom<usize>> for $type {
             type Output = [$item];
             fn index(&self, i: ops::RangeFrom<usize>) -> &Self::Output {
-                unsafe { as_slice(self.0) }.index(i)
+                (**self).index(i)
             }
         }
 
         impl ops::Index<ops::RangeTo<usize>> for $type {
             type Output = [$item];
             fn index(&self, i: ops::RangeTo<usize>) -> &Self::Output {
-                unsafe { as_slice(self.0) }.index(i)
+                (**self).index(i)
             }
         }
 
         impl ops::Index<ops::Range<usize>> for $type {
             type Output = [$item];
             fn index(&self, i: ops::Range<usize>) -> &Self::Output {
-                unsafe { as_slice(self.0) }.index(i)
+                (**self).index(i)
             }
         }
 
         impl ops::Index<usize> for $type {
             type Output = $item;
             fn index(&self, i: usize) -> &Self::Output {
-                unsafe { as_slice(self.0) }.index(i)
+                (**self).index(i)
+            }
+        }
+
+        impl ops::Index<ops::RangeFull> for $type {
+            type Output = [$item];
+            fn index(&self, _: ops::RangeFull) -> &Self::Output {
+                &**self
             }
         }
 

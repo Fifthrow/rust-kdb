@@ -176,6 +176,7 @@ macro_rules! impl_klist {
     }
 }
 
+impl_klist! {KBoolList, KType = BOOLEAN_LIST, Item = bool, Joiner = ja}
 impl_klist! {KByteList, KType = BYTE_LIST, Item = u8, Joiner = ja}
 impl_klist! {KCharList, KType = CHAR_LIST, Item = i8, Joiner = ja}
 impl_klist! {KShortList, KType = SHORT_LIST, Item = i16, Joiner = ja}
@@ -192,6 +193,8 @@ impl_klist! {KDateList, KType = DATE_LIST, Item = KDate, Joiner = ja}
 impl_klist! {KDateTimeList, KType = DATE_TIME_LIST, Item = KDateTime, Joiner = ja}
 impl_klist! {KSymbolList, KType = SYMBOL_LIST, Item = KSymbol, Joiner = js}
 impl_klist! {KGuidList, KType = GUID_LIST, Item = KGuid, Joiner = ja }
+impl_klist! {KTimestampList, KType = TIMESTAMP_LIST, Item = KTimestamp, Joiner = ja}
+impl_klist! {KTimespanList, KType = TIMESPAN_LIST, Item = KTimespan, Joiner = ja}
 
 impl FromIterator<String> for KSymbolList {
     fn from_iter<I: IntoIterator<Item = String>>(iter: I) -> Self {

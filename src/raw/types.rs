@@ -477,7 +477,7 @@ impl From<KDateTime> for SystemTime {
 }
 
 #[repr(transparent)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct KTimestamp(i64);
 
 impl From<i64> for KTimestamp {
@@ -493,7 +493,7 @@ impl From<KTimestamp> for i64 {
 }
 
 #[repr(transparent)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct KTimespan(i64);
 
 impl From<i64> for KTimespan {

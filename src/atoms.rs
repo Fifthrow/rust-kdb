@@ -110,6 +110,8 @@ impl_katom! {KDateAtom, AtomType = KDate, KType = DATE_ATOM, Ctor = ki, Accessor
 impl_katom! {KDateTimeAtom, AtomType = KDateTime, KType = DATE_TIME_ATOM, Ctor = kf, Accessor: dt }
 impl_katom! {KSymbolAtom, AtomType = KSymbol, KType = SYMBOL_ATOM, Ctor = ks, Accessor: sym }
 impl_katom! {KGuidAtom, AtomType = KGuid, KType = GUID_ATOM, Ctor = ku, Accessor: u }
+impl_katom! {KTimestampAtom, AtomType = KTimestamp, KType = TIMESTAMP_ATOM, Ctor = kj, Accessor: tst }
+impl_katom! {KTimespanAtom, AtomType = KTimespan, KType = TIMESPAN_ATOM, Ctor = kj, Accessor: ts }
 
 //Extra convenience conversions implemented manually
 impl TryFrom<&str> for KSymbolAtom {
@@ -141,6 +143,17 @@ impl KItem for KError {
     const K_TYPE: KType = ERROR;
     fn as_k_ptr(&self) -> *const K {
         self.0
+    }
+}
+
+impl fmt::Debug for KError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let c_str = unsafe { CStr::from_ptr((*self.0).union.s) };
+        if let Ok(s) = c_str.to_str() {
+            write!(f, "KError({})", s)
+        } else {
+            write!(f, "KError(Unknown)")
+        }
     }
 }
 

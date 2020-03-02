@@ -27,6 +27,7 @@ pub struct InvalidKCastError {
 
 macro_rules! impl_katom {
     {$type:ident, AtomType = $atom_type:ident, KType = $k_type:ident, Ctor = $ctor:ident, Accessor: $accessor:ident } => {
+        #[repr(transparent)]
         pub struct $type(* const K);
 
         impl KItem for $type {

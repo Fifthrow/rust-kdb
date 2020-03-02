@@ -56,6 +56,7 @@ pub trait KListItem: KItem {
 
 macro_rules! impl_klist {
     {$type:ident, KType = $k_type:ident, Item = $item:ty, Joiner = $joiner:ident} => {
+        #[repr(transparent)]
         pub struct $type(* const K);
 
         impl KItem for $type {

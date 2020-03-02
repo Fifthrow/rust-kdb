@@ -1,8 +1,9 @@
 use crate::any::KAny;
 use crate::atoms::KItem;
 use crate::error::ConversionError;
+use crate::mixed_list::KMixedList;
 use crate::raw::kapi;
-use crate::raw::types::{as_slice, DICT, K, MIXED_LIST};
+use crate::raw::types::{KType, DICT, K, MIXED_LIST};
 use std::convert::TryFrom;
 use std::iter::FromIterator;
 use std::mem;
@@ -17,28 +18,67 @@ impl KItem for KDict {
     }
 }
 
+//TODO: Check array alignment is defined as per C.
 impl KDict {
-    pub fn len(&self) -> usize {
+    fn raw_key_value_lists(&self) -> &[KMixedList; 2] {
         unsafe {
-            let key_list = (*self.0).union.list.g0 as *const _ as *const K;
-            (*key_list).union.list.n as usize
+            ((&(*self.0).union.list.g0) as *const *mut u8 as *const [KMixedList; 2])
+                .as_ref()
+                .unwrap()
         }
+    }
+
+    fn raw_key_value_lists_mut(&mut self) -> &mut [KMixedList; 2] {
+        unsafe {
+            ((&(*self.0).union.list.g0) as *const *mut u8 as *mut [KMixedList; 2])
+                .as_mut()
+                .unwrap()
+        }
+    }
+
+    fn key_list_mut(&mut self) -> &mut KMixedList {
+        &mut self.raw_key_value_lists_mut()[0]
+    }
+
+    fn value_list_mut(&mut self) -> &mut KMixedList {
+        &mut self.raw_key_value_lists_mut()[1]
+    }
+
+    fn key_list(&self) -> &KMixedList {
+        &self.raw_key_value_lists()[0]
+    }
+
+    fn value_list(&self) -> &KMixedList {
+        &self.raw_key_value_lists()[1]
+    }
+
+    pub fn len(&self) -> usize {
+        self.key_list().len()
     }
 
     /// Gets a slice containing all the keys in this dictionary
     pub fn keys(&self) -> &[KAny] {
-        unsafe {
-            let key_list = (*self.0).union.list.g0 as *const _ as *const K;
-            as_slice(key_list)
-        }
+        &self.key_list()[..]
     }
 
     /// Gets a slice containing all the values in this dictionary
     pub fn values(&self) -> &[KAny] {
+        &self.value_list()[..]
+    }
+
+    pub fn new() -> Self {
         unsafe {
-            let value_list = ((*self.0).union.list.g0 as *const _ as *const K).offset(1);
-            as_slice(value_list)
+            let keys = kapi::ktn(MIXED_LIST.into(), 0) as *mut K;
+            let values = kapi::ktn(MIXED_LIST.into(), 0) as *mut K;
+            KDict(kapi::xD(keys, values))
         }
+    }
+
+    pub fn insert(&mut self, key: impl Into<KAny>, value: impl Into<KAny>) {
+        let key = key.into();
+        let value = value.into();
+        self.key_list_mut().push(key);
+        self.value_list_mut().push(value);
     }
 
     /// Gets a value by key. Note that K dictionaries are unordered and hence is an O(n) operation.
@@ -55,6 +95,12 @@ impl KDict {
 
     pub fn iter(&self) -> impl Iterator<Item = (&KAny, &KAny)> {
         self.keys().into_iter().zip(self.values().iter())
+    }
+}
+
+impl Default for KDict {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -101,8 +147,8 @@ where
             let mut keys = kapi::ktn(MIXED_LIST.into(), bound as i64) as *mut K;
             let mut values = kapi::ktn(MIXED_LIST.into(), bound as i64) as *mut K;
             for (key, value) in iter {
-                kapi::jk(&mut keys, mem::ManuallyDrop::new(key.into()).as_k_ptr());
-                kapi::jk(&mut values, mem::ManuallyDrop::new(value.into()).as_k_ptr());
+                keys = kapi::jk(&mut keys, mem::ManuallyDrop::new(key.into()).as_k_ptr()) as *mut _;
+                values = kapi::jk(&mut values, mem::ManuallyDrop::new(value.into()).as_k_ptr()) as *mut _;
             }
             KDict(kapi::xD(keys, values))
         }

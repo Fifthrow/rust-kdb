@@ -1,6 +1,7 @@
 use crate::atoms::*;
 use crate::error::ConversionError;
 use crate::lists::*;
+use crate::mixed_list::KMixedList;
 use crate::raw::kapi;
 use crate::raw::types::*;
 use std::fmt;

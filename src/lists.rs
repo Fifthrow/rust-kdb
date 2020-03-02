@@ -18,13 +18,20 @@ use std::iter::FromIterator;
 use std::mem;
 use std::ops;
 
-fn list<I, T>(kind: KType, iter: I, append: impl Fn(*mut K, T) -> *mut K) -> *const K
+pub(crate) fn list<I, T>(kind: KType, iter: I, append: impl Fn(*mut K, T) -> *mut K) -> *const K
 where
     I: IntoIterator<Item = T>,
 {
     let iter: I::IntoIter = iter.into_iter();
     let mut k = unsafe { kapi::ktn(kind.into(), iter.size_hint().0 as i64) as *mut K };
-    iter.for_each(|s| k = append(k, s));
+    let slice = unsafe { as_mut_slice(k) };
+    iter.enumerate().for_each(|(i, s)| {
+        if i < slice.len() {
+            slice[i] = s;
+        } else {
+            k = append(k, s);
+        }
+    });
     k
 }
 
@@ -74,11 +81,11 @@ macro_rules! impl_klist {
             }
 
             pub fn push(&mut self, value: $item) {
-                unsafe{ kapi::$joiner(&mut (self.0 as *mut _), &value as * const _ as * const _); }
+                self.0 = unsafe{ kapi::$joiner(&mut (self.0 as *mut K), &value as * const _ as * const _) };
             }
 
             pub fn extend(&mut self, other: $type) {
-                unsafe { kapi::jv(&mut (self.0 as *mut K), other.0); }
+                self.0 = unsafe { kapi::jv(&mut (self.0 as *mut K), mem::ManuallyDrop::new(other).0) };
             }
 
             pub fn new() -> Self {
@@ -221,61 +228,94 @@ impl<'a> FromIterator<&'a str> for KSymbolList {
     }
 }
 
-pub struct KMixedList(*const K);
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl KListItem for KMixedList {
-    type Item = KAny;
-}
-
-impl KMixedList {
-    pub fn iter(&self) -> impl Iterator<Item = &KAny> {
-        unsafe { as_slice(self.0).into_iter() }
+    #[test]
+    fn len_returns_number_of_elements() {
+        let mut list = KIntList::new();
+        list.push(1);
+        list.push(2);
+        assert_eq!(2, list.len());
     }
 
-    pub fn push(&mut self, item: impl Into<KAny>) {
-        let k_any = mem::ManuallyDrop::new(item.into());
-
-        unsafe {
-            kapi::jk(&mut (self.0 as *mut K), k_any.as_k_ptr());
-        }
+    #[test]
+    fn len_returns_0_for_new_list() {
+        let list = KIntList::new();
+        assert_eq!(0, list.len());
     }
-}
 
-impl KItem for KMixedList {
-    fn as_k_ptr(&self) -> *const K {
-        self.0
+    #[test]
+    fn iter_over_empty_returns_no_elements() {
+        let list = KIntList::new();
+        assert_eq!(Vec::<&i32>::new(), list.iter().collect::<Vec<_>>());
     }
-}
 
-impl<T> FromIterator<T> for KMixedList
-where
-    T: KItem,
-{
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> KMixedList {
-        KMixedList(list(MIXED_LIST, iter, |mut k, item| unsafe {
-            kapi::jk(&mut k, item.clone_k_ptr()) as *mut K
-        }))
+    #[test]
+    fn push_adds_a_single_element_to_the_list() {
+        let mut list = KIntList::new();
+        list.push(2);
+        assert_eq!((1, 2), (list.len(), list[0]));
     }
-}
 
-impl From<KMixedList> for KAny {
-    fn from(item: KMixedList) -> KAny {
-        unsafe { mem::transmute(item) }
+    #[test]
+    fn iter_returns_all_elements() {
+        let mut list = KIntList::new();
+        list.push(1);
+        list.push(2);
+        assert_eq!(vec![&1, &2], list.iter().collect::<Vec<&i32>>());
     }
-}
 
-impl TryFrom<KAny> for KMixedList {
-    type Error = ConversionError;
+    #[test]
+    fn collect_creates_collection() {
+        let list: KIntList = (1..=10i32).collect();
+        assert_eq!((1..=10).collect::<Vec<_>>(), list.iter().copied().collect::<Vec<_>>());
+    }
 
-    fn try_from(any: KAny) -> Result<Self, Self::Error> {
-        let t = any.k_type();
-        if t == MIXED_LIST {
-            Ok(unsafe { mem::transmute(any) })
-        } else {
-            Err(ConversionError::InvalidKCast {
-                from: t,
-                to: MIXED_LIST,
-            })
-        }
+    #[test]
+    fn extend_merges_two_lists_together() {
+        let mut list: KIntList = (1..=5i32).collect();
+        let list_2: KIntList = (6..=10i32).collect();
+        list.extend(list_2);
+        assert_eq!((1..=10).collect::<Vec<_>>(), list.iter().copied().collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn index_rangefull_converts_list_to_slice() {
+        let list: KIntList = (1..=10i32).collect();
+        let slice = &list[..];
+        let expected: Vec<_> = (1..=10i32).collect();
+        assert_eq!(&expected[..], slice);
+    }
+
+    #[test]
+    fn index_range_converts_list_to_slice() {
+        let list: KIntList = (1..=10i32).collect();
+        let slice = &list[1..5];
+        let expected: Vec<_> = (1..=10i32).collect();
+        assert_eq!(&expected[1..5], slice);
+    }
+
+    #[test]
+    fn index_rangeto_converts_list_to_slice() {
+        let list: KIntList = (1..=10i32).collect();
+        let slice = &list[..5];
+        let expected: Vec<_> = (1..=10i32).collect();
+        assert_eq!(&expected[..5], slice);
+    }
+
+    #[test]
+    fn index_rangefrom_converts_list_to_slice() {
+        let list: KIntList = (1..=10i32).collect();
+        let slice = &list[5..];
+        let expected: Vec<_> = (1..=10i32).collect();
+        assert_eq!(&expected[5..], slice);
+    }
+
+    #[test]
+    fn index_usize_returns_item() {
+        let list: KIntList = (1..=10i32).collect();
+        assert_eq!(6, list[5]);
     }
 }

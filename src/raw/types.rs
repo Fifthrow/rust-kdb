@@ -142,6 +142,11 @@ pub struct List {
     pub g0: *mut G,
 }
 
+pub(crate) unsafe fn as_mut_slice<'a, T>(k: *mut K) -> &'a mut [T] {
+    let list = &(*k).union.list;
+    slice::from_raw_parts_mut(&list.g0 as *const _ as *mut _, list.n as usize)
+}
+
 pub(crate) unsafe fn as_slice<'a, T>(k: *const K) -> &'a [T] {
     let list = &(*k).union.list;
     slice::from_raw_parts(&list.g0 as *const _ as *const _, list.n as usize)
@@ -235,7 +240,7 @@ impl PartialEq for K {
 
         match self.t {
             //Atoms
-            t if t > KType(0) && t < KType(20) => unsafe {
+            t if t > KType(-20) && t < KType(0) => unsafe {
                 libc::memcmp(
                     &self.union as *const _ as _,
                     &other.union as *const _ as _,

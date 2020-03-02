@@ -14,6 +14,7 @@ mod connection;
 mod dict;
 mod error;
 mod lists;
+mod mixed_list;
 pub mod raw;
 mod table;
 

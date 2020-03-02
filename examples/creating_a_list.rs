@@ -4,7 +4,7 @@ use kdb::KIntList;
 
 fn main() {
     //Create a list containing the numbers from 1 to 10.
-    let mut list: KIntList = (1..=10i32).into_iter().collect();
+    let mut list: KIntList = (1..=10i32).collect();
 
     //Create another list by pushing incrementally
     let mut list_2 = KIntList::new();
@@ -21,7 +21,7 @@ fn main() {
     }
 
     // we can also use it as a slice:
-    for i in &list[5..6] {
+    for i in &list[..5] {
         println!("{}", i)
     }
 }

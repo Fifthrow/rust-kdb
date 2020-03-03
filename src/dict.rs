@@ -9,6 +9,7 @@ use std::iter::FromIterator;
 use std::mem;
 use std::ops::Index;
 
+#[repr(transparent)]
 pub struct KDict(*const K);
 
 impl KItem for KDict {
@@ -66,6 +67,7 @@ impl KDict {
         &self.value_list()[..]
     }
 
+    /// Create a new empty dictionary.
     pub fn new() -> Self {
         unsafe {
             let keys = kapi::ktn(MIXED_LIST.into(), 0) as *mut K;
@@ -74,6 +76,8 @@ impl KDict {
         }
     }
 
+    /// Insert a specified key and value at the end of the dictionary.
+    /// No checks are done on uniqueness so duplicates are possible.
     pub fn insert(&mut self, key: impl Into<KAny>, value: impl Into<KAny>) {
         let key = key.into();
         let value = value.into();
@@ -81,7 +85,7 @@ impl KDict {
         self.value_list_mut().push(value);
     }
 
-    /// Gets a value by key. Note that K dictionaries are unordered and hence is an O(n) operation.
+    /// Gets a value by key. Note that KDB dictionaries are unordered and hence is an O(n) operation.
     pub fn get<T: Into<KAny>>(&self, key: T) -> Option<&KAny> {
         let key = key.into();
         let index = self
@@ -160,5 +164,52 @@ impl Drop for KDict {
         unsafe {
             kapi::r0(self.0);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_creates_an_empty_dictionary() {
+        let d = KDict::new();
+        assert_eq!(0, d.len());
+    }
+
+    #[test]
+    fn insert_adds_an_item_to_the_dictionary() {
+        let mut d = KDict::new();
+        d.insert(1i32, 3i32);
+        assert_eq!(vec![(&KAny::from(1i32), &KAny::from(3i32))], d.iter().collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn iter_returns_key_value_tuples() {
+        let mut d = KDict::new();
+        d.insert(1i32, 3i32);
+        d.insert(2i32, 6i32);
+        d.insert(4i32, 9i32);
+        assert_eq!(vec![(&KAny::from(1i32), &KAny::from(3i32)),
+        (&KAny::from(2i32), &KAny::from(6i32)),
+        (&KAny::from(4i32), &KAny::from(9i32))], d.iter().collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn len_returns_length_of_the_dictionary() {
+        let mut d = KDict::new();
+        d.insert(1i32, 3i32);
+        d.insert(2i32, 6i32);
+        d.insert(4i32, 9i32);
+        assert_eq!(3, d.len());
+    }
+
+    #[test]
+    fn index_key_returns_matching_item() {
+        let mut d = KDict::new();
+        d.insert(1i32, 3i32);
+        d.insert(2i32, 6i32);
+        d.insert(4i32, 9i32);
+        assert_eq!(KAny::from(6i32), d[2i32]);
     }
 }

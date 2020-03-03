@@ -19,6 +19,7 @@ pub mod raw;
 mod table;
 
 pub use any::KAny;
+pub use mixed_list::KMixedList;
 pub use atoms::*;
 pub use connection::Connection;
 pub use dict::KDict;

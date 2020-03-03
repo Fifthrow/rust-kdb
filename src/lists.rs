@@ -57,11 +57,11 @@ pub trait KListItem: KItem {
 macro_rules! impl_klist {
     {$type:ident, KType = $k_type:ident, Item = $item:ty, Joiner = $joiner:ident} => {
         #[repr(transparent)]
-        pub struct $type(* const K);
+        pub struct $type(*const K);
 
         impl KItem for $type {
             const K_TYPE: KType = $k_type;
-            fn as_k_ptr(&self) -> * const K { self.0 }
+            fn as_k_ptr(&self) -> *const K { self.0 }
         }
 
         impl Drop for $type {
@@ -82,7 +82,7 @@ macro_rules! impl_klist {
             }
 
             pub fn push(&mut self, value: $item) {
-                self.0 = unsafe{ kapi::$joiner(&mut (self.0 as *mut K), &value as * const _ as * const _) };
+                self.0 = unsafe{ kapi::$joiner(&mut (self.0 as *mut K), &value as *const _ as *const _) };
             }
 
             pub fn extend(&mut self, other: $type) {

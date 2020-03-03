@@ -1,7 +1,7 @@
 use crate::any::KAny;
 use crate::atoms::KItem;
 use crate::error::ConversionError;
-use crate::lists::{KListItem};
+use crate::lists::KListItem;
 use crate::raw::kapi;
 use crate::raw::types::*;
 use std::convert::TryFrom;

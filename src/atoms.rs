@@ -28,11 +28,11 @@ pub struct InvalidKCastError {
 macro_rules! impl_katom {
     {$type:ident, AtomType = $atom_type:ident, KType = $k_type:ident, Ctor = $ctor:ident, Accessor: $accessor:ident } => {
         #[repr(transparent)]
-        pub struct $type(* const K);
+        pub struct $type(*const K);
 
         impl KItem for $type {
             const K_TYPE: KType = $k_type;
-            fn as_k_ptr(&self) -> * const K { self.0 }
+            fn as_k_ptr(&self) -> *const K { self.0 }
         }
 
         impl From<$type> for $atom_type {

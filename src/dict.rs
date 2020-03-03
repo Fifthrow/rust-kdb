@@ -181,7 +181,10 @@ mod tests {
     fn insert_adds_an_item_to_the_dictionary() {
         let mut d = KDict::new();
         d.insert(1i32, 3i32);
-        assert_eq!(vec![(&KAny::from(1i32), &KAny::from(3i32))], d.iter().collect::<Vec<_>>());
+        assert_eq!(
+            vec![(&KAny::from(1i32), &KAny::from(3i32))],
+            d.iter().collect::<Vec<_>>()
+        );
     }
 
     #[test]
@@ -190,9 +193,14 @@ mod tests {
         d.insert(1i32, 3i32);
         d.insert(2i32, 6i32);
         d.insert(4i32, 9i32);
-        assert_eq!(vec![(&KAny::from(1i32), &KAny::from(3i32)),
-        (&KAny::from(2i32), &KAny::from(6i32)),
-        (&KAny::from(4i32), &KAny::from(9i32))], d.iter().collect::<Vec<_>>());
+        assert_eq!(
+            vec![
+                (&KAny::from(1i32), &KAny::from(3i32)),
+                (&KAny::from(2i32), &KAny::from(6i32)),
+                (&KAny::from(4i32), &KAny::from(9i32))
+            ],
+            d.iter().collect::<Vec<_>>()
+        );
     }
 
     #[test]

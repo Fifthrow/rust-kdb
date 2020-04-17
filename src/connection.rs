@@ -219,11 +219,14 @@ impl Connection {
 }
 
 impl Drop for Connection {
+    #[cfg(not(feature = "embedded"))]
     fn drop(&mut self) {
         unsafe {
             kapi::kclose(self.0);
         }
     }
+    #[cfg(feature = "embedded")]
+    fn drop(&mut self) {}
 }
 
 #[cfg(feature = "embedded")]

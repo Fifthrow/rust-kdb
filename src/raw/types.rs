@@ -165,12 +165,12 @@ pub union KUnion {
     pub u: KGuid,
     pub k0: *mut K,
     pub list: List,
-    // custom accessors for the wrapping types  - these make the implementation macros easier
+    // custom accessors for the wrapping types - these make the implementation macros easier
     // so we don't have to do special cases or lots of typecasting - we can just get the union
     // to do that for us! Note that all the wrapping types *must* be repr(transparent), otherwise
     // it's undefined behaviour as the the underlying representation in the compiler is not defined.
     // It's worth noting that KDB uses a bit as a boolean type, but stores it in a byte. Coincidentally
-    // That maps exactly to a rust bool (which *must* be either 1 or 0 else behavious is undefined).
+    // that maps exactly to a rust bool (which *must* be either 1 or 0 else behaviour is undefined).
     pub bl: bool,
     pub sym: KSymbol,
     pub ts: KTimespan,

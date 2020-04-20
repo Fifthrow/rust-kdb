@@ -1,4 +1,5 @@
 use crate::raw::types::KType;
+use std::str::Utf8Error;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -7,6 +8,14 @@ pub enum ConversionError {
     InvalidKCast { from: KType, to: KType },
     #[error("Duration too long for K timespan type")]
     DurationTooLong,
+    #[error("Symbol not a valid Rust string")]
+    InvalidString,
+}
+
+impl From<Utf8Error> for ConversionError {
+    fn from(_: Utf8Error) -> ConversionError {
+        ConversionError::InvalidString
+    }
 }
 
 #[derive(Debug, Error)]

@@ -138,6 +138,30 @@ impl TryFrom<KSymbolAtom> for String {
     }
 }
 
+impl TryFrom<&str> for KAny {
+    type Error = NulError;
+    fn try_from(val: &str) -> Result<Self, Self::Error> {
+        let c_str = CString::new(val)?;
+        Ok(KAny(unsafe { kapi::ks(c_str.as_ptr()) }))
+    }
+}
+
+impl TryFrom<String> for KAny {
+    type Error = NulError;
+    fn try_from(val: String) -> Result<Self, Self::Error> {
+        Self::try_from(&val[..])
+    }
+}
+
+impl TryFrom<KAny> for String {
+    type Error = ConversionError;
+
+    fn try_from(any: KAny) -> Result<Self, Self::Error> {
+        let sym = KSymbolAtom::try_from(any)?;
+        String::try_from(sym).map_err(ConversionError::from)
+    }
+}
+
 pub struct KError(pub(crate) *const K);
 
 impl KItem for KError {

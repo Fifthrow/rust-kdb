@@ -146,6 +146,15 @@ impl TryFrom<&str> for KAny {
     }
 }
 
+impl TryFrom<KAny> for KSymbol {
+    type Error = ConversionError;
+
+    fn try_from(any: KAny) -> Result<Self, Self::Error> {
+        let sym = KSymbolAtom::try_from(any)?;
+        Ok(KSymbol::from(sym))
+    }
+}
+
 impl TryFrom<String> for KAny {
     type Error = NulError;
     fn try_from(val: String) -> Result<Self, Self::Error> {

@@ -173,6 +173,19 @@ impl TryFrom<KAny> for String {
 
 pub struct KError(pub(crate) *const K);
 
+const NULL_SYMBOL: KSymbol = KSymbol(std::ptr::null());
+
+impl KError {
+    pub fn new(s: &str) -> Self {
+        let sym = KSymbolAtom::try_from(s).unwrap_or(NULL_SYMBOL.into());
+        let k = mem::ManuallyDrop::new(sym).as_k_ptr() as *mut K;
+        unsafe {
+            (*k).t = ERROR;
+        }
+        KError(k)
+    }
+}
+
 impl KItem for KError {
     const K_TYPE: KType = ERROR;
     fn as_k_ptr(&self) -> *const K {

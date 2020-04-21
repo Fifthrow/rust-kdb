@@ -271,7 +271,7 @@ impl fmt::Debug for K {
 /// Can be converted to/from strings using comparisons
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-pub struct KSymbol(*const i8);
+pub struct KSymbol(pub(crate) *const i8);
 
 impl PartialEq for KSymbol {
     fn eq(&self, other: &KSymbol) -> bool {

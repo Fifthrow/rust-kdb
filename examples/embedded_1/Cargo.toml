@@ -1,0 +1,20 @@
+[package]
+name = "embedded_1"
+version = "0.1.0"
+authors = ["prodrive11 <pat@pragmatick.io>"]
+edition = "2018"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+nix = "0.17.0"
+kdb = { path = "../../", features = ["embedded"] }
+
+[[bin]]
+name = "q_lib_exec"
+path = "src/q_lib_exec.rs"
+
+[lib]
+name = "embedded"
+crate-type = ["cdylib"]
+

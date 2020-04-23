@@ -4,6 +4,7 @@ use crate::dict::KDict;
 use crate::error::ConversionError;
 use crate::raw::kapi;
 use crate::raw::types::{KType, K, TABLE};
+use crate::unowned::Unowned;
 use std::convert::TryFrom;
 use std::mem;
 
@@ -65,3 +66,14 @@ impl Drop for KTable {
         c: KMixedList::Item => {}
     })
 */
+impl From<Unowned<KTable>> for KTable {
+    fn from(item: Unowned<KTable>) -> KTable {
+        KTable(unsafe { item.clone_k_ptr() })
+    }
+}
+
+impl From<Unowned<KTable>> for Unowned<KAny> {
+    fn from(item: Unowned<KTable>) -> Unowned<KAny> {
+        unsafe { mem::transmute(item) }
+    }
+}

@@ -4,6 +4,7 @@ use crate::error::ConversionError;
 use crate::lists::KListItem;
 use crate::raw::kapi;
 use crate::raw::types::*;
+use crate::unowned::Unowned;
 use std::convert::TryFrom;
 use std::fmt;
 use std::iter::FromIterator;
@@ -152,6 +153,18 @@ impl TryFrom<KAny> for KMixedList {
                 to: MIXED_LIST,
             })
         }
+    }
+}
+
+impl From<Unowned<KMixedList>> for KMixedList {
+    fn from(item: Unowned<KMixedList>) -> KMixedList {
+        KMixedList(unsafe { item.clone_k_ptr() })
+    }
+}
+
+impl From<Unowned<KMixedList>> for Unowned<KAny> {
+    fn from(item: Unowned<KMixedList>) -> Unowned<KAny> {
+        unsafe { mem::transmute(item) }
     }
 }
 

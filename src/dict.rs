@@ -4,6 +4,7 @@ use crate::error::ConversionError;
 use crate::mixed_list::KMixedList;
 use crate::raw::kapi;
 use crate::raw::types::{KType, DICT, K, MIXED_LIST};
+use crate::unowned::Unowned;
 use std::convert::TryFrom;
 use std::iter::FromIterator;
 use std::mem;
@@ -159,6 +160,17 @@ where
     }
 }
 
+impl From<Unowned<KDict>> for KDict {
+    fn from(item: Unowned<KDict>) -> KDict {
+        KDict(unsafe { item.clone_k_ptr() })
+    }
+}
+
+impl From<Unowned<KDict>> for Unowned<KAny> {
+    fn from(item: Unowned<KDict>) -> Unowned<KAny> {
+        unsafe { mem::transmute(item) }
+    }
+}
 impl Drop for KDict {
     fn drop(&mut self) {
         unsafe {

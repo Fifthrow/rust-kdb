@@ -2,6 +2,7 @@ use crate::any::KAny;
 use crate::error::ConversionError;
 use crate::raw::kapi;
 use crate::raw::types::*;
+use crate::unowned::Unowned;
 use std::convert::TryFrom;
 use std::ffi::{CStr, CString, NulError};
 use std::fmt;
@@ -69,6 +70,38 @@ macro_rules! impl_katom {
                 } else {
                     Err(ConversionError::InvalidKCast{ from: t, to: $k_type })
                 }
+            }
+        }
+
+        impl From<Unowned<$type>> for $atom_type {
+            fn from(k_atom: Unowned<$type>) -> $atom_type {
+                **k_atom
+            }
+        }
+
+        impl From<Unowned<$type>> for $type {
+            fn from(item: Unowned<$type>) -> $type {
+                $type(unsafe { item.clone_k_ptr() })
+            }
+        }
+
+        impl From<Unowned<$type>> for Unowned<KAny> {
+            fn from(item: Unowned<$type>) -> Unowned<KAny> {
+                unsafe { mem::transmute(item) }
+            }
+        }
+
+        impl TryFrom<Unowned<KAny>> for Unowned<$type>
+        {
+            type Error = ConversionError;
+
+            fn try_from(any: Unowned<KAny>) -> Result<Self, Self::Error> {
+                    let t = any.k_type();
+                    if t == $k_type {
+                        Ok(unsafe { mem::transmute(any) })
+                    } else {
+                        Err(ConversionError::InvalidKCast{ from: t, to: $k_type })
+                    }
             }
         }
 
@@ -245,5 +278,30 @@ impl From<KError> for crate::error::Error {
             .map(str::to_owned)
             .map(|e| crate::error::Error::QError(e))
             .unwrap_or(crate::error::Error::UnknownQError)
+    }
+}
+
+impl From<Unowned<KError>> for KError {
+    fn from(item: Unowned<KError>) -> KError {
+        KError(unsafe { item.clone_k_ptr() })
+    }
+}
+
+impl From<Unowned<KError>> for Unowned<KAny> {
+    fn from(item: Unowned<KError>) -> Unowned<KAny> {
+        unsafe { mem::transmute(item) }
+    }
+}
+
+impl TryFrom<Unowned<KAny>> for Unowned<KError> {
+    type Error = ConversionError;
+
+    fn try_from(any: Unowned<KAny>) -> Result<Self, Self::Error> {
+        let t = any.k_type();
+        if t == ERROR {
+            Ok(unsafe { mem::transmute(any) })
+        } else {
+            Err(ConversionError::InvalidKCast { from: t, to: ERROR })
+        }
     }
 }

@@ -18,6 +18,7 @@ mod lists;
 mod mixed_list;
 pub mod raw;
 mod table;
+mod unowned;
 
 pub use any::KAny;
 pub use atoms::*;
@@ -28,6 +29,7 @@ pub use lists::*;
 pub use mixed_list::KMixedList;
 pub use raw::types::*;
 pub use table::KTable;
+pub use unowned::Unowned;
 pub mod c_api {
     pub use crate::raw::kapi::*;
 }

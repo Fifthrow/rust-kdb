@@ -11,6 +11,7 @@ use crate::atoms::*;
 use crate::error::ConversionError;
 use crate::raw::kapi;
 use crate::raw::types::*;
+use crate::unowned::Unowned;
 use std::convert::TryFrom;
 use std::ffi::CString;
 use std::fmt;
@@ -180,6 +181,32 @@ macro_rules! impl_klist {
             type Error = ConversionError;
 
             fn try_from(any: KAny) -> Result<Self, Self::Error> {
+                    let t = any.k_type();
+                    if t == $k_type {
+                        Ok(unsafe { mem::transmute(any) })
+                    } else {
+                        Err(ConversionError::InvalidKCast{ from: t, to: $k_type })
+                    }
+            }
+        }
+
+        impl From<Unowned<$type>> for $type {
+            fn from(item: Unowned<$type>) -> $type {
+                $type(unsafe { item.clone_k_ptr() })
+            }
+        }
+
+        impl From<Unowned<$type>> for Unowned<KAny> {
+            fn from(item: Unowned<$type>) -> Unowned<KAny> {
+                unsafe { mem::transmute(item) }
+            }
+        }
+
+        impl TryFrom<Unowned<KAny>> for Unowned<$type>
+        {
+            type Error = ConversionError;
+
+            fn try_from(any: Unowned<KAny>) -> Result<Self, Self::Error> {
                     let t = any.k_type();
                     if t == $k_type {
                         Ok(unsafe { mem::transmute(any) })

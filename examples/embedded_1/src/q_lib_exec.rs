@@ -1,24 +1,11 @@
-use nix::unistd::execvp;
-use std::ffi::{CStr, CString};
 use std::env::args;
-
+use std::process::Command;
 fn main() {
-    let capp = CString::new("q").unwrap(); // "q36.64" 
-    let mut cargs = [
-        CStr::from_bytes_with_nul(b"q\0").unwrap(),
-        CStr::from_bytes_with_nul(b"src/load.q\0").unwrap(),
-        CStr::from_bytes_with_nul(b"\0").unwrap(),
-        CStr::from_bytes_with_nul(b"\0").unwrap(),
-    ];
+    let mut cmd = Command::new("q");
+    cmd.arg("src/load.q");
 
-    if let Some(in_args) = args().nth(1) {
-        match in_args.as_str() {
-          "m32" => cargs[2] = CStr::from_bytes_with_nul(b"m32\0").unwrap(),
-          _ => {},
-        }
+    if let Some("m32") = args().nth(1).as_ref().map(String::as_str) {
+        cmd.arg("m32");
     };
-    let _ = match execvp(&capp, &cargs) {
-        Err(e) => println!("Can't exec q due: {:?}. Make sure q is on the PATH.", e),
-        _ => {} //exec replaces this process, so this cond is unreachable
-    };
+    cmd.status().unwrap();
 }

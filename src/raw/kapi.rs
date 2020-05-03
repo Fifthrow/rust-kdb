@@ -57,11 +57,7 @@ extern "C" {
     pub fn xD(keys: *const K, values: *const K) -> *const K;
 
     pub fn ymd(y: I, m: I, d: I) -> I;
-}
 
-#[cfg(not(feature = "embedded"))]
-#[link(name = "kdb")]
-extern "C" {
     pub fn kclose(handle: I) -> V;
     pub fn khp(hostname: S, port: I) -> I;
     pub fn khpu(hostname: S, port: I, credentials: S) -> I;

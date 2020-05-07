@@ -308,6 +308,22 @@ impl std::convert::TryFrom<&str> for KSymbol {
     }
 }
 
+impl std::convert::TryFrom<KSymbol> for &'static str {
+    type Error = std::str::Utf8Error;
+    fn try_from(sym: KSymbol) -> Result<&'static str, Self::Error> {
+        let sym = unsafe { std::ffi::CStr::from_ptr(sym.0 as *const _) };
+        sym.to_str()
+    }
+}
+
+impl std::convert::TryFrom<&KSymbol> for &'static str {
+    type Error = std::str::Utf8Error;
+    fn try_from(sym: &KSymbol) -> Result<&'static str, Self::Error> {
+        let sym = unsafe { std::ffi::CStr::from_ptr(sym.0 as *const _) };
+        sym.to_str()
+    }
+}
+
 impl std::convert::TryFrom<KSymbol> for String {
     type Error = std::str::Utf8Error;
     fn try_from(sym: KSymbol) -> Result<String, Self::Error> {

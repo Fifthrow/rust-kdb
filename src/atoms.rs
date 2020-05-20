@@ -170,8 +170,8 @@ impl_katom! {KDateAtom, AtomType = KDate, KType = DATE_ATOM, Ctor = ki, Accessor
 impl_katom! {KDateTimeAtom, AtomType = KDateTime, KType = DATE_TIME_ATOM, Ctor = kf, Accessor: dt }
 impl_katom! {KSymbolAtom, AtomType = KSymbol, KType = SYMBOL_ATOM, Ctor = ks, Accessor: sym }
 impl_katom! {KGuidAtom, AtomType = KGuid, KType = GUID_ATOM, Ctor = ku, Accessor: u }
-impl_katom! {KTimestampAtom, AtomType = KTimestamp, KType = TIMESTAMP_ATOM, Ctor = kts, Accessor: tst }
-impl_katom! {KTimespanAtom, AtomType = KTimespan, KType = TIMESPAN_ATOM, Ctor = ktp, Accessor: ts }
+impl_katom! {KTimestampAtom, AtomType = KTimestamp, KType = TIMESTAMP_ATOM, Ctor = tst, Accessor: tst }
+impl_katom! {KTimespanAtom, AtomType = KTimespan, KType = TIMESPAN_ATOM, Ctor = tsp, Accessor: ts }
 
 //Extra convenience conversions implemented manually
 impl TryFrom<&str> for KSymbolAtom {

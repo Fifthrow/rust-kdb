@@ -1,0 +1,17 @@
+[package]
+name = "pipe_select_poll"
+version = "0.1.0"
+authors = ["prodrive11 <p.bukowinski@gmail.com>"]
+edition = "2018"
+build = "build.rs"
+
+[dependencies]
+kdb = { path = "../../", features = ["embedded"] }
+nix = "0.17.0"
+libc = "0.2.71"
+lazy_static = "1.4.0"
+
+[lib]
+name = "pipe_fd"
+crate-type = ["cdylib"]
+

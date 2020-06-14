@@ -11,7 +11,7 @@ Make sure:
 
 ```console
  #64bit
- root$ cargo build && q src/load.q m32
+ root$ cargo build && q src/load.q
 
  #32bit
  root$ cargo build --target=i686-unknown-linux-gnu && q src/load.q m32

@@ -1,4 +1,5 @@
-//  root$ cargo build --target=i686-unknown-linux-gnu && q src/load.q m32
+// 32bit: root$ cargo build --target=i686-unknown-linux-gnu && q src/load.q m32
+// 64bit: root$ cargo build && q src/load.q
 
 #[macro_use]
 extern crate lazy_static;

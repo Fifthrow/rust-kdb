@@ -2,6 +2,18 @@ use super::types::*;
 
 pub type KCallback = extern "C" fn(arg1: I) -> *const K;
 
+pub const K_NANO_OFFSET: i64   = 946_684_800_000_000_000;
+pub const K_TYPE_TIMESTAMP:i32 = -12;
+pub const K_TYPE_TIMESPAN:i32  = -16;
+
+pub fn tst(epoch_nanos:i64) -> *const K {
+      unsafe { ktj(K_TYPE_TIMESTAMP, epoch_nanos - K_NANO_OFFSET) }
+}
+
+pub fn tsp(epoch_nanos:i64) -> *const K {
+      unsafe { ktj(K_TYPE_TIMESPAN, epoch_nanos - K_NANO_OFFSET) }
+}
+
 #[cfg_attr(not(feature = "embedded"), link(name = "kdb"))]
 extern "C" {
     pub fn b9(mode: I, x: *const K) -> *const K;

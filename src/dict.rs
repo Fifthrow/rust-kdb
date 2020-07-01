@@ -91,7 +91,7 @@ impl KDict {
         let key = key.into();
         let index = self
             .keys()
-            .into_iter()
+            .iter()
             .enumerate()
             .find(|(_, k2)| **k2 == key)
             .map(|(i, _)| i)?;
@@ -99,7 +99,7 @@ impl KDict {
     }
 
     pub fn iter(&self) -> impl Iterator<Item = (&KAny, &KAny)> {
-        self.keys().into_iter().zip(self.values().iter())
+        self.keys().iter().zip(self.values().iter())
     }
 }
 

@@ -310,7 +310,7 @@ impl From<KError> for crate::error::Error {
         c_str
             .to_str()
             .map(str::to_owned)
-            .map(|e| crate::error::Error::QError(e))
+            .map(crate::error::Error::QError)
             .unwrap_or(crate::error::Error::UnknownQError)
     }
 }

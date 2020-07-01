@@ -34,8 +34,8 @@ impl KListItem for KMixedList {
 }
 
 impl KMixedList {
-    pub fn iter<'a>(&self) -> impl Iterator<Item = &KAny> {
-        unsafe { as_slice(self.0).into_iter() }
+    pub fn iter(&self) -> impl Iterator<Item = &KAny> {
+        unsafe { as_slice(self.0).iter() }
     }
 
     pub fn push(&mut self, value: impl Into<KAny>) {

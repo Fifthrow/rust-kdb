@@ -50,7 +50,7 @@ pub trait KListItem: KItem {
 
         unsafe {
             let list_ptr = (*self.as_k_ptr()).union.list.g0 as *const Self::Item;
-            Some(&*list_ptr.offset(index as isize))
+            Some(&*list_ptr.add(index))
         }
     }
 }
@@ -78,7 +78,7 @@ macro_rules! impl_klist {
         }
 
         impl $type {
-            pub fn iter<'a>(&self) -> impl Iterator<Item = &$item> {
+            pub fn iter(&self) -> impl Iterator<Item = &$item> {
                 unsafe { as_slice(self.0).into_iter() }
             }
 

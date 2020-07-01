@@ -22,7 +22,7 @@ impl KAny {
     // Using a TryAsRef trait is a pain too. And the end result for users is ugly. Argh references are complicated.
     pub fn try_as_ref<T: KItem>(&self) -> Result<&T, ConversionError> {
         if T::K_TYPE == self.k_type() && mem::size_of::<T>() == mem::size_of::<Self>() {
-            Ok(unsafe { mem::transmute(self) })
+            Ok(unsafe { &*(self as *const KAny as *const T) })
         } else {
             Err(ConversionError::InvalidKCast {
                 from: self.k_type(),

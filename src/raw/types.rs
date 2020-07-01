@@ -122,7 +122,7 @@ impl fmt::Debug for KType {
 }
 
 impl KType {
-    pub fn atom_size(&self) -> usize {
+    pub fn atom_size(self) -> usize {
         match KType(self.0.abs()) {
             BOOLEAN_LIST | BYTE_LIST | CHAR_LIST => 1,
             SHORT_LIST => 2,
@@ -198,16 +198,16 @@ pub struct K {
 pub struct Attr(u8);
 
 impl Attr {
-    pub fn sorted(&self) -> bool {
+    pub fn sorted(self) -> bool {
         self.0 == 1
     }
-    pub fn unique(&self) -> bool {
+    pub fn unique(self) -> bool {
         self.0 == 2
     }
-    pub fn partioned(&self) -> bool {
+    pub fn partioned(self) -> bool {
         self.0 == 3
     }
-    pub fn grouped(&self) -> bool {
+    pub fn grouped(self) -> bool {
         self.0 == 5
     }
 }
@@ -300,13 +300,15 @@ impl From<Symbol> for *const i8 {
 
 impl std::convert::From<String> for Symbol {
     fn from(s: String) -> Symbol {
-        Symbol(unsafe { super::kapi::ss(std::ffi::CString::new(s).unwrap().as_ptr()) })
+        let s = std::ffi::CString::new(s).unwrap();
+        Symbol(unsafe { super::kapi::ss(s.as_ptr()) })
     }
 }
 
 impl std::convert::From<&str> for Symbol {
     fn from(s: &str) -> Symbol {
-        Symbol(unsafe { super::kapi::ss(std::ffi::CString::new(s).unwrap().as_ptr()) })
+        let s = std::ffi::CString::new(s).unwrap();
+        Symbol(unsafe { super::kapi::ss(s.as_ptr()) })
     }
 }
 

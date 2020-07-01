@@ -1,13 +1,13 @@
 extern crate kdb;
 
-use kdb::{KSymbol, KSymbolAtom};
+use kdb::{KSymbolAtom, Symbol};
 use std::convert::TryFrom;
 
 fn main() {
     //Create two identical symbols in different ways, and check that they are equal.
-    let sym = KSymbol::try_from("Hello, World").unwrap();
+    let sym = Symbol::try_from("Hello, World").unwrap();
     //Note: converting a string into a symbol is not an infallible operation:
-    let sym_2 = KSymbol::try_from(String::from("Hello") + ", World").unwrap();
+    let sym_2 = Symbol::try_from(String::from("Hello") + ", World").unwrap();
     assert_eq!(sym, sym_2);
 
     // As an atom:

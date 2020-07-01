@@ -3,7 +3,7 @@ use crate::error::ConversionError;
 use crate::raw::kapi;
 use crate::raw::types::*;
 use crate::unowned::Unowned;
-use std::convert::TryFrom;
+use std::convert::{TryFrom, TryInto};
 use std::ffi::{CStr, CString, NulError};
 use std::fmt;
 use std::mem;
@@ -86,6 +86,14 @@ macro_rules! impl_katom {
             }
         }
 
+        impl TryFrom<KAny> for $atom_type {
+            type Error = ConversionError;
+
+            fn try_from(any: KAny) -> Result<Self, Self::Error> {
+                (&any).try_into()
+            }
+        }
+
         impl TryFrom<&KAny> for $atom_type {
             type Error = ConversionError;
 
@@ -162,16 +170,16 @@ impl_katom! {KLongAtom, AtomType = i64, KType = LONG_ATOM, Ctor = kj, Accessor: 
 impl_katom! {KRealAtom, AtomType = f32, KType = REAL_ATOM, Ctor = ke, Accessor: e }
 impl_katom! {KFloatAtom, AtomType = f64, KType = FLOAT_ATOM, Ctor = kf, Accessor: f }
 impl_katom! {KBoolAtom, AtomType = bool, KType = BOOLEAN_ATOM, Ctor = kg, Accessor: bl }
-impl_katom! {KSecondAtom, AtomType = KSecond, KType = SECOND_ATOM, Ctor = ki, Accessor: sec }
-impl_katom! {KMinuteAtom, AtomType = KMinute, KType = MINUTE_ATOM, Ctor = ki, Accessor: min }
-impl_katom! {KMonthAtom, AtomType = KMonth, KType = MONTH_ATOM, Ctor = ki, Accessor: m }
-impl_katom! {KTimeAtom, AtomType = KTime, KType = TIME_ATOM, Ctor = ki, Accessor: t }
-impl_katom! {KDateAtom, AtomType = KDate, KType = DATE_ATOM, Ctor = ki, Accessor: d }
-impl_katom! {KDateTimeAtom, AtomType = KDateTime, KType = DATE_TIME_ATOM, Ctor = kf, Accessor: dt }
-impl_katom! {KSymbolAtom, AtomType = KSymbol, KType = SYMBOL_ATOM, Ctor = ks, Accessor: sym }
-impl_katom! {KGuidAtom, AtomType = KGuid, KType = GUID_ATOM, Ctor = ku, Accessor: u }
-impl_katom! {KTimestampAtom, AtomType = KTimestamp, KType = TIMESTAMP_ATOM, Ctor = tst, Accessor: tst }
-impl_katom! {KTimespanAtom, AtomType = KTimespan, KType = TIMESPAN_ATOM, Ctor = tsp, Accessor: ts }
+impl_katom! {KSecondAtom, AtomType = Second, KType = SECOND_ATOM, Ctor = ki, Accessor: sec }
+impl_katom! {KMinuteAtom, AtomType = Minute, KType = MINUTE_ATOM, Ctor = ki, Accessor: min }
+impl_katom! {KMonthAtom, AtomType = Month, KType = MONTH_ATOM, Ctor = ki, Accessor: m }
+impl_katom! {KTimeAtom, AtomType = Time, KType = TIME_ATOM, Ctor = ki, Accessor: t }
+impl_katom! {KDateAtom, AtomType = Date, KType = DATE_ATOM, Ctor = ki, Accessor: d }
+impl_katom! {KDateTimeAtom, AtomType = DateTime, KType = DATE_TIME_ATOM, Ctor = kf, Accessor: dt }
+impl_katom! {KSymbolAtom, AtomType = Symbol, KType = SYMBOL_ATOM, Ctor = ks, Accessor: sym }
+impl_katom! {KGuidAtom, AtomType = Guid, KType = GUID_ATOM, Ctor = ku, Accessor: u }
+impl_katom! {KTimestampAtom, AtomType = Timestamp, KType = TIMESTAMP_ATOM, Ctor = kj, Accessor: tst }
+impl_katom! {KTimespanAtom, AtomType = Timespan, KType = TIMESPAN_ATOM, Ctor = kj, Accessor: ts }
 
 //Extra convenience conversions implemented manually
 impl TryFrom<&str> for KSymbolAtom {
@@ -210,15 +218,6 @@ impl TryFrom<&str> for KAny {
     fn try_from(val: &str) -> Result<Self, Self::Error> {
         let c_str = CString::new(val)?;
         Ok(KAny(unsafe { kapi::ks(c_str.as_ptr()) }))
-    }
-}
-
-impl TryFrom<KAny> for KSymbol {
-    type Error = ConversionError;
-
-    fn try_from(any: KAny) -> Result<Self, Self::Error> {
-        let sym = KSymbolAtom::try_from(any)?;
-        Ok(KSymbol::from(sym))
     }
 }
 

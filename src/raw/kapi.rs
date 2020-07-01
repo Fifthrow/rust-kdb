@@ -47,7 +47,7 @@ extern "C" {
     pub fn ktd(keyed_table: *const K) -> *const K;
     pub fn ktj(begin: I, end: J) -> *const K;
     pub fn ktn(k_type: I, len: J) -> *const K;
-    pub fn ku(guid: KGuid) -> *const K;
+    pub fn ku(guid: Guid) -> *const K;
     pub fn kz(date_time: F) -> *const K;
 
     pub fn m9() -> V;

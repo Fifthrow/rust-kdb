@@ -227,16 +227,16 @@ impl_klist! {KLongList, KType = LONG_LIST, Item = i64, Joiner = ja}
 impl_klist! {KRealList, KType = REAL_LIST, Item = f32, Joiner = ja}
 impl_klist! {KFloatList, KType = FLOAT_LIST, Item = f64, Joiner = ja}
 impl_klist! {KBooleanList, KType = BOOLEAN_LIST, Item = bool, Joiner = ja}
-impl_klist! {KSecondList, KType = SECOND_LIST, Item = KSecond, Joiner = ja}
-impl_klist! {KMinuteList, KType = MINUTE_LIST, Item = KMinute, Joiner = ja}
-impl_klist! {KMonthList, KType = MONTH_LIST, Item = KMonth, Joiner = ja}
-impl_klist! {KTimeList, KType = TIME_LIST, Item = KTime, Joiner = ja}
-impl_klist! {KDateList, KType = DATE_LIST, Item = KDate, Joiner = ja}
-impl_klist! {KDateTimeList, KType = DATE_TIME_LIST, Item = KDateTime, Joiner = ja}
-impl_klist! {KSymbolList, KType = SYMBOL_LIST, Item = KSymbol, Joiner = js}
-impl_klist! {KGuidList, KType = GUID_LIST, Item = KGuid, Joiner = ja }
-impl_klist! {KTimestampList, KType = TIMESTAMP_LIST, Item = KTimestamp, Joiner = ja}
-impl_klist! {KTimespanList, KType = TIMESPAN_LIST, Item = KTimespan, Joiner = ja}
+impl_klist! {KSecondList, KType = SECOND_LIST, Item = Second, Joiner = ja}
+impl_klist! {KMinuteList, KType = MINUTE_LIST, Item = Minute, Joiner = ja}
+impl_klist! {KMonthList, KType = MONTH_LIST, Item = Month, Joiner = ja}
+impl_klist! {KTimeList, KType = TIME_LIST, Item = Time, Joiner = ja}
+impl_klist! {KDateList, KType = DATE_LIST, Item = Date, Joiner = ja}
+impl_klist! {KDateTimeList, KType = DATE_TIME_LIST, Item = DateTime, Joiner = ja}
+impl_klist! {KSymbolList, KType = SYMBOL_LIST, Item = Symbol, Joiner = js}
+impl_klist! {KGuidList, KType = GUID_LIST, Item = Guid, Joiner = ja }
+impl_klist! {KTimestampList, KType = TIMESTAMP_LIST, Item = Timestamp, Joiner = ja}
+impl_klist! {KTimespanList, KType = TIMESPAN_LIST, Item = Timespan, Joiner = ja}
 
 impl FromIterator<String> for KSymbolList {
     fn from_iter<I: IntoIterator<Item = String>>(iter: I) -> Self {

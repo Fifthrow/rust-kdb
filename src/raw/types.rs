@@ -162,7 +162,7 @@ pub union KUnion {
     pub e: E,
     pub f: F,
     pub s: S,
-    pub u: KGuid,
+    pub u: Guid,
     pub k0: *mut K,
     pub list: List,
     // custom accessors for the wrapping types - these make the implementation macros easier
@@ -172,15 +172,15 @@ pub union KUnion {
     // It's worth noting that KDB uses a bit as a boolean type, but stores it in a byte. Coincidentally
     // that maps exactly to a rust bool (which *must* be either 1 or 0 else behaviour is undefined).
     pub bl: bool,
-    pub sym: KSymbol,
-    pub ts: KTimespan,
-    pub t: KTime,
-    pub m: KMonth,
-    pub tst: KTimestamp,
-    pub min: KMinute,
-    pub sec: KSecond,
-    pub d: KDate,
-    pub dt: KDateTime,
+    pub sym: Symbol,
+    pub ts: Timespan,
+    pub t: Time,
+    pub m: Month,
+    pub tst: Timestamp,
+    pub min: Minute,
+    pub sec: Second,
+    pub d: Date,
+    pub dt: DateTime,
 }
 
 #[repr(C)]
@@ -266,81 +266,83 @@ impl fmt::Debug for K {
     }
 }
 
+pub type KSymbol = Symbol;
+pub type KTimestamp = Timestamp;
+pub type KTimespan = Timespan;
+
 /// Represents a KDB Symbol (interned string)
 /// Implements basic symbol operations for efficiency
-/// Can be converted to/from strings using comparisons
+/// Can be converted to/from strings
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-pub struct KSymbol(pub(crate) *const i8);
+pub struct Symbol(pub(crate) *const i8);
 
-impl PartialEq for KSymbol {
-    fn eq(&self, other: &KSymbol) -> bool {
+impl PartialEq for Symbol {
+    fn eq(&self, other: &Symbol) -> bool {
         std::ptr::eq(self.0, other.0)
     }
 }
 
-impl Eq for KSymbol {}
+impl Eq for Symbol {}
 
-impl std::hash::Hash for KSymbol {
+impl std::hash::Hash for Symbol {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         std::ptr::hash(self.0, state)
     }
 }
 
-// TODO: safety warning - need to do this in some private way. Might need to reimplement KSymbolAtom manually instead of via macro
-impl From<KSymbol> for *const i8 {
-    fn from(sym: KSymbol) -> Self {
+// TODO: safety warning - need to do this in some private way. Might need to reimplement SymbolAtom manually instead of via macro
+impl From<Symbol> for *const i8 {
+    fn from(sym: Symbol) -> Self {
         sym.0
     }
 }
 
-impl std::convert::TryFrom<String> for KSymbol {
-    type Error = std::ffi::NulError;
-    fn try_from(s: String) -> Result<KSymbol, Self::Error> {
-        Ok(KSymbol(unsafe { super::kapi::ss(std::ffi::CString::new(s)?.as_ptr()) }))
+impl std::convert::From<String> for Symbol {
+    fn from(s: String) -> Symbol {
+        Symbol(unsafe { super::kapi::ss(std::ffi::CString::new(s).unwrap().as_ptr()) })
     }
 }
 
-impl std::convert::TryFrom<&str> for KSymbol {
-    type Error = std::ffi::NulError;
-    fn try_from(s: &str) -> Result<KSymbol, Self::Error> {
-        Ok(KSymbol(unsafe { super::kapi::ss(std::ffi::CString::new(s)?.as_ptr()) }))
+impl std::convert::From<&str> for Symbol {
+    fn from(s: &str) -> Symbol {
+        Symbol(unsafe { super::kapi::ss(std::ffi::CString::new(s).unwrap().as_ptr()) })
     }
 }
 
-impl std::convert::TryFrom<KSymbol> for &'static str {
+impl std::convert::TryFrom<Symbol> for &'static str {
     type Error = std::str::Utf8Error;
-    fn try_from(sym: KSymbol) -> Result<&'static str, Self::Error> {
+    fn try_from(sym: Symbol) -> Result<&'static str, Self::Error> {
         let sym = unsafe { std::ffi::CStr::from_ptr(sym.0 as *const _) };
         sym.to_str()
     }
 }
 
-impl std::convert::TryFrom<&KSymbol> for &'static str {
+impl std::convert::TryFrom<&Symbol> for &'static str {
     type Error = std::str::Utf8Error;
-    fn try_from(sym: &KSymbol) -> Result<&'static str, Self::Error> {
+    fn try_from(sym: &Symbol) -> Result<&'static str, Self::Error> {
         let sym = unsafe { std::ffi::CStr::from_ptr(sym.0 as *const _) };
         sym.to_str()
     }
 }
 
-impl std::convert::TryFrom<KSymbol> for String {
+impl std::convert::TryFrom<Symbol> for String {
     type Error = std::str::Utf8Error;
-    fn try_from(sym: KSymbol) -> Result<String, Self::Error> {
+    fn try_from(sym: Symbol) -> Result<String, Self::Error> {
         let sym = unsafe { std::ffi::CStr::from_ptr(sym.0 as *const _) };
         sym.to_str().map(str::to_owned)
     }
 }
 
-impl std::convert::TryFrom<&KSymbol> for String {
+impl std::convert::TryFrom<&Symbol> for String {
     type Error = std::str::Utf8Error;
-    fn try_from(sym: &KSymbol) -> Result<String, Self::Error> {
+    fn try_from(sym: &Symbol) -> Result<String, Self::Error> {
         let sym = unsafe { std::ffi::CStr::from_ptr(sym.0 as *const _) };
         sym.to_str().map(str::to_owned)
     }
 }
 
-impl fmt::Display for KSymbol {
+impl fmt::Display for Symbol {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
@@ -353,7 +355,7 @@ impl fmt::Display for KSymbol {
     }
 }
 
-impl fmt::Debug for KSymbol {
+impl fmt::Debug for Symbol {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(self, f)
     }
@@ -361,26 +363,26 @@ impl fmt::Debug for KSymbol {
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-pub struct KSecond(i32);
-impl From<i32> for KSecond {
-    fn from(val: i32) -> KSecond {
-        KSecond(val)
+pub struct Second(i32);
+impl From<i32> for Second {
+    fn from(val: i32) -> Second {
+        Second(val)
     }
 }
 
-impl From<KSecond> for i32 {
-    fn from(val: KSecond) -> i32 {
+impl From<Second> for i32 {
+    fn from(val: Second) -> i32 {
         val.0
     }
 }
 
-impl fmt::Display for KSecond {
+impl fmt::Display for Second {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} seconds", self.0)
     }
 }
 
-impl fmt::Debug for KSecond {
+impl fmt::Debug for Second {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(self, f)
     }
@@ -388,26 +390,26 @@ impl fmt::Debug for KSecond {
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-pub struct KMinute(i32);
-impl From<i32> for KMinute {
-    fn from(val: i32) -> KMinute {
-        KMinute(val)
+pub struct Minute(i32);
+impl From<i32> for Minute {
+    fn from(val: i32) -> Minute {
+        Minute(val)
     }
 }
 
-impl From<KMinute> for i32 {
-    fn from(val: KMinute) -> i32 {
+impl From<Minute> for i32 {
+    fn from(val: Minute) -> i32 {
         val.0
     }
 }
 
-impl fmt::Display for KMinute {
+impl fmt::Display for Minute {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} seconds", self.0)
     }
 }
 
-impl fmt::Debug for KMinute {
+impl fmt::Debug for Minute {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(self, f)
     }
@@ -415,41 +417,41 @@ impl fmt::Debug for KMinute {
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
-pub struct KDate(i32);
-impl From<i32> for KDate {
-    fn from(val: i32) -> KDate {
-        KDate(val)
+pub struct Date(i32);
+impl From<i32> for Date {
+    fn from(val: i32) -> Date {
+        Date(val)
     }
 }
 
-impl From<KDate> for i32 {
-    fn from(val: KDate) -> i32 {
+impl From<Date> for i32 {
+    fn from(val: Date) -> i32 {
         val.0
     }
 }
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-pub struct KMonth(i32);
-impl From<i32> for KMonth {
-    fn from(val: i32) -> KMonth {
-        KMonth(val)
+pub struct Month(i32);
+impl From<i32> for Month {
+    fn from(val: i32) -> Month {
+        Month(val)
     }
 }
 
-impl From<KMonth> for i32 {
-    fn from(val: KMonth) -> i32 {
+impl From<Month> for i32 {
+    fn from(val: Month) -> i32 {
         val.0
     }
 }
 
-impl fmt::Display for KMonth {
+impl fmt::Display for Month {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{} months", self.0)
     }
 }
 
-impl fmt::Debug for KMonth {
+impl fmt::Debug for Month {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(self, f)
     }
@@ -457,31 +459,31 @@ impl fmt::Debug for KMonth {
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
-pub struct KTime(i32);
-impl From<i32> for KTime {
-    fn from(val: i32) -> KTime {
-        KTime(val)
+pub struct Time(i32);
+impl From<i32> for Time {
+    fn from(val: i32) -> Time {
+        Time(val)
     }
 }
 
-impl From<KTime> for i32 {
-    fn from(val: KTime) -> i32 {
+impl From<Time> for i32 {
+    fn from(val: Time) -> i32 {
         val.0
     }
 }
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
-pub struct KDateTime(f64);
+pub struct DateTime(f64);
 
-impl From<f64> for KDateTime {
-    fn from(val: f64) -> KDateTime {
-        KDateTime(val)
+impl From<f64> for DateTime {
+    fn from(val: f64) -> DateTime {
+        DateTime(val)
     }
 }
 
-impl From<KDateTime> for f64 {
-    fn from(val: KDateTime) -> f64 {
+impl From<DateTime> for f64 {
+    fn from(val: DateTime) -> f64 {
         val.0
     }
 }
@@ -489,8 +491,8 @@ impl From<KDateTime> for f64 {
 /// Represents 01/01/2000
 const K_DATE_START_F64: f64 = 0f64;
 
-impl From<KDateTime> for SystemTime {
-    fn from(val: KDateTime) -> SystemTime {
+impl From<DateTime> for SystemTime {
+    fn from(val: DateTime) -> SystemTime {
         let secs = f64::from(val) * 86400.0;
         let offset = Duration::from_secs_f64(secs + K_DATE_START_F64);
         SystemTime::UNIX_EPOCH + offset
@@ -499,90 +501,90 @@ impl From<KDateTime> for SystemTime {
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
-pub struct KTimestamp(i64);
+pub struct Timestamp(i64);
 
-impl From<i64> for KTimestamp {
-    fn from(val: i64) -> KTimestamp {
-        KTimestamp(val)
+impl From<i64> for Timestamp {
+    fn from(val: i64) -> Timestamp {
+        Timestamp(val)
     }
 }
 
-impl From<KTimestamp> for i64 {
-    fn from(val: KTimestamp) -> i64 {
+impl From<Timestamp> for i64 {
+    fn from(val: Timestamp) -> i64 {
         val.0
     }
 }
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
-pub struct KTimespan(i64);
+pub struct Timespan(i64);
 
-impl From<i64> for KTimespan {
-    fn from(val: i64) -> KTimespan {
-        KTimespan(val)
+impl From<i64> for Timespan {
+    fn from(val: i64) -> Timespan {
+        Timespan(val)
     }
 }
 
-impl From<KTimespan> for i64 {
-    fn from(val: KTimespan) -> i64 {
+impl From<Timespan> for i64 {
+    fn from(val: Timespan) -> i64 {
         val.0
     }
 }
 
-impl From<KTimespan> for Duration {
-    fn from(span: KTimespan) -> Duration {
+impl From<Timespan> for Duration {
+    fn from(span: Timespan) -> Duration {
         Duration::from_nanos(span.0 as u64)
     }
 }
 
-impl TryFrom<Duration> for KTimespan {
+impl TryFrom<Duration> for Timespan {
     type Error = crate::error::ConversionError;
 
-    fn try_from(d: Duration) -> Result<KTimespan, Self::Error> {
+    fn try_from(d: Duration) -> Result<Timespan, Self::Error> {
         let d = d.as_nanos();
         if d > std::i64::MAX as u128 {
             Err(crate::error::ConversionError::DurationTooLong)
         } else {
-            Ok(KTimespan(d as i64))
+            Ok(Timespan(d as i64))
         }
     }
 }
 
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-pub struct KGuid([u8; 16]);
+pub struct Guid([u8; 16]);
 
-impl From<[u8; 16]> for KGuid {
-    fn from(x: [u8; 16]) -> KGuid {
-        KGuid(x)
+impl From<[u8; 16]> for Guid {
+    fn from(x: [u8; 16]) -> Guid {
+        Guid(x)
     }
 }
 
-impl From<KGuid> for [u8; 16] {
-    fn from(x: KGuid) -> [u8; 16] {
+impl From<Guid> for [u8; 16] {
+    fn from(x: Guid) -> [u8; 16] {
         x.0
     }
 }
 
-impl From<Uuid> for KGuid {
-    fn from(x: Uuid) -> KGuid {
-        KGuid(*x.as_bytes())
+impl From<Uuid> for Guid {
+    fn from(x: Uuid) -> Guid {
+        Guid(*x.as_bytes())
     }
 }
 
-impl From<KGuid> for Uuid {
-    fn from(x: KGuid) -> Uuid {
+impl From<Guid> for Uuid {
+    fn from(x: Guid) -> Uuid {
         Uuid::from_bytes(x.0)
     }
 }
 
-impl fmt::Display for KGuid {
+impl fmt::Display for Guid {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&Uuid::from_bytes(self.0), f)
     }
 }
 
-impl fmt::Debug for KGuid {
+impl fmt::Debug for Guid {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(self, f)
     }

@@ -1,9 +1,9 @@
-use libc;
 use std::convert::TryFrom;
 use std::fmt;
 use std::slice;
 use std::time::{Duration, SystemTime};
 use uuid::Uuid;
+use super::kapi::{K_SEC_OFFSET, K_DAY_OFFSET};
 
 //TODO: Timespan,
 pub const MIXED_LIST: KType = KType(0);
@@ -430,6 +430,21 @@ impl From<Date> for i32 {
     }
 }
 
+impl From<SystemTime> for Date {
+    fn from(st: SystemTime) -> Date {
+        let dur = st.duration_since(SystemTime::UNIX_EPOCH).unwrap();
+        let dur_secs = (dur.as_secs() / 86400) as i64;
+        Date(dur_secs as i32 - K_DAY_OFFSET)
+    }
+}
+
+impl From<Date> for SystemTime {
+    fn from(date: Date) -> SystemTime {
+        let secs = date.0 as i64 * 86400 + K_SEC_OFFSET;
+        SystemTime::UNIX_EPOCH + Duration::from_secs(secs as u64)
+    }
+}
+
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct Month(i32);
@@ -488,16 +503,20 @@ impl From<DateTime> for f64 {
     }
 }
 
-/// Represents 01/01/2000
-const K_DATE_START_F64: f64 = 0f64;
-
 impl From<DateTime> for SystemTime {
-    fn from(val: DateTime) -> SystemTime {
-        let secs = f64::from(val) * 86400.0;
-        let offset = Duration::from_secs_f64(secs + K_DATE_START_F64);
-        SystemTime::UNIX_EPOCH + offset
+    fn from(date: DateTime) -> SystemTime {
+        let secs = date.0 as i64 * 86400 + K_SEC_OFFSET;
+        SystemTime::UNIX_EPOCH + Duration::from_secs(secs as u64)
     }
 }
+
+impl From<SystemTime> for DateTime {
+    fn from(st: SystemTime) -> DateTime {
+        let dur = st.duration_since(SystemTime::UNIX_EPOCH).unwrap();
+        DateTime((dur.as_secs_f64() / 86400.0) - K_DAY_OFFSET as f64)
+    }
+}
+
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]

@@ -3,7 +3,7 @@ use std::fmt;
 use std::slice;
 use std::time::{Duration, SystemTime};
 use uuid::Uuid;
-use super::kapi::{K_SEC_OFFSET, K_DAY_OFFSET};
+use super::kapi::{K_SEC_OFFSET, K_DAY_OFFSET, K_NANO_OFFSET};
 
 //TODO: Timespan,
 pub const MIXED_LIST: KType = KType(0);
@@ -422,13 +422,13 @@ impl fmt::Debug for Minute {
 pub struct Date(i32);
 impl From<i32> for Date {
     fn from(val: i32) -> Date {
-        Date(val)
+        Date(val - K_DAY_OFFSET)
     }
 }
 
 impl From<Date> for i32 {
     fn from(val: Date) -> i32 {
-        val.0
+        val.0 + K_DAY_OFFSET
     }
 }
 
@@ -495,13 +495,13 @@ pub struct DateTime(f64);
 
 impl From<f64> for DateTime {
     fn from(val: f64) -> DateTime {
-        DateTime(val)
+        DateTime(val - K_SEC_OFFSET as f64)
     }
 }
 
 impl From<DateTime> for f64 {
     fn from(val: DateTime) -> f64 {
-        val.0
+        val.0 + K_SEC_OFFSET as f64
     }
 }
 
@@ -519,20 +519,37 @@ impl From<SystemTime> for DateTime {
     }
 }
 
-
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
 pub struct Timestamp(i64);
 
+impl Timestamp {
+    pub fn from_nanos_unix(n: u64) -> Timestamp {
+        Timestamp(n as i64 - K_NANO_OFFSET)
+    }
+
+    pub fn to_nanos_unix(&self) -> u64 {
+        (self.0 + K_NANO_OFFSET) as u64
+    }
+
+    pub fn as_raw(&self) -> i64 {
+        self.0
+    }
+
+    pub fn from_raw(n: i64) -> Timestamp {
+        Timestamp(n)
+    }
+}
+
 impl From<i64> for Timestamp {
     fn from(val: i64) -> Timestamp {
-        Timestamp(val)
+        Timestamp(val - K_NANO_OFFSET)
     }
 }
 
 impl From<Timestamp> for i64 {
     fn from(val: Timestamp) -> i64 {
-        val.0
+        val.0 + K_NANO_OFFSET
     }
 }
 

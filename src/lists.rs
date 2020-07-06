@@ -176,6 +176,33 @@ macro_rules! impl_klist {
             }
         }
 
+        impl TryFrom<&KAny> for &$type {
+            type Error = ConversionError;
+
+            fn try_from(any: &KAny) -> Result<Self, Self::Error> {
+                let t = any.k_type();
+                if t == $k_type {
+                    Ok(unsafe { &*(any as * const KAny as * const $type) })
+                } else {
+                    Err(ConversionError::InvalidKCast{ from: t, to: $k_type })
+                }
+            }
+        }
+
+        impl TryFrom<&Unowned<KAny>> for &$type
+        {
+            type Error = ConversionError;
+
+            fn try_from(any: &Unowned<KAny>) -> Result<Self, Self::Error> {
+                    let t = any.k_type();
+                    if t == $k_type {
+                        Ok(unsafe { mem::transmute(any) })
+                    } else {
+                        Err(ConversionError::InvalidKCast{ from: t, to: $k_type })
+                    }
+            }
+        }
+        
         impl TryFrom<KAny> for $type
         {
             type Error = ConversionError;

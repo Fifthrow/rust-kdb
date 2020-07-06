@@ -6,10 +6,12 @@ use crate::raw::kapi;
 use crate::raw::types::*;
 use std::fmt;
 use std::mem;
+use std::convert::TryFrom;
 
 /// KAny wraps the core K type safely. It can be converted into more specific wrappers
 /// that offer more useful functionality using standard rust conversions (TryFrom) or
 /// checked reference conversions (the try_as_ref method)
+#[repr(transparent)]
 pub struct KAny(pub(crate) *const K);
 
 impl KAny {
@@ -58,46 +60,46 @@ impl Drop for KAny {
 impl fmt::Debug for KAny {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.k_type() {
-            MIXED_LIST => fmt::Debug::fmt(self.try_as_ref::<KMixedList>().unwrap(), f),
-            BOOLEAN_ATOM => fmt::Debug::fmt(self.try_as_ref::<KBoolAtom>().unwrap(), f),
-            GUID_ATOM => fmt::Debug::fmt(self.try_as_ref::<KGuidAtom>().unwrap(), f),
-            BYTE_ATOM => fmt::Debug::fmt(self.try_as_ref::<KByteAtom>().unwrap(), f),
-            SHORT_ATOM => fmt::Debug::fmt(self.try_as_ref::<KShortAtom>().unwrap(), f),
-            INT_ATOM => fmt::Debug::fmt(self.try_as_ref::<KIntAtom>().unwrap(), f),
-            LONG_ATOM => fmt::Debug::fmt(self.try_as_ref::<KLongAtom>().unwrap(), f),
-            REAL_ATOM => fmt::Debug::fmt(self.try_as_ref::<KRealAtom>().unwrap(), f),
-            FLOAT_ATOM => fmt::Debug::fmt(self.try_as_ref::<KFloatAtom>().unwrap(), f),
-            CHAR_ATOM => fmt::Debug::fmt(self.try_as_ref::<KCharAtom>().unwrap(), f),
-            SYMBOL_ATOM => fmt::Debug::fmt(self.try_as_ref::<KSymbolAtom>().unwrap(), f),
-            TIMESTAMP_ATOM => fmt::Debug::fmt(self.try_as_ref::<KTimestampAtom>().unwrap(), f),
-            MONTH_ATOM => fmt::Debug::fmt(self.try_as_ref::<KMonthAtom>().unwrap(), f),
-            DATE_ATOM => fmt::Debug::fmt(self.try_as_ref::<KDateAtom>().unwrap(), f),
-            DATE_TIME_ATOM => fmt::Debug::fmt(self.try_as_ref::<KDateTimeAtom>().unwrap(), f),
-            TIMESPAN_ATOM => fmt::Debug::fmt(self.try_as_ref::<KTimespanAtom>().unwrap(), f),
-            MINUTE_ATOM => fmt::Debug::fmt(self.try_as_ref::<KMinuteAtom>().unwrap(), f),
-            SECOND_ATOM => fmt::Debug::fmt(self.try_as_ref::<KSecondAtom>().unwrap(), f),
-            TIME_ATOM => fmt::Debug::fmt(self.try_as_ref::<KBoolAtom>().unwrap(), f),
-            BOOLEAN_LIST => fmt::Debug::fmt(self.try_as_ref::<KBoolList>().unwrap(), f),
-            GUID_LIST => fmt::Debug::fmt(self.try_as_ref::<KGuidList>().unwrap(), f),
-            BYTE_LIST => fmt::Debug::fmt(self.try_as_ref::<KByteList>().unwrap(), f),
-            SHORT_LIST => fmt::Debug::fmt(self.try_as_ref::<KShortList>().unwrap(), f),
-            INT_LIST => fmt::Debug::fmt(self.try_as_ref::<KIntList>().unwrap(), f),
-            LONG_LIST => fmt::Debug::fmt(self.try_as_ref::<KLongList>().unwrap(), f),
-            REAL_LIST => fmt::Debug::fmt(self.try_as_ref::<KRealList>().unwrap(), f),
-            FLOAT_LIST => fmt::Debug::fmt(self.try_as_ref::<KFloatList>().unwrap(), f),
-            CHAR_LIST => fmt::Debug::fmt(self.try_as_ref::<KCharList>().unwrap(), f),
-            SYMBOL_LIST => fmt::Debug::fmt(self.try_as_ref::<KSymbolList>().unwrap(), f),
-            TIMESTAMP_LIST => fmt::Debug::fmt(self.try_as_ref::<KTimestampList>().unwrap(), f),
-            MONTH_LIST => fmt::Debug::fmt(self.try_as_ref::<KMonthList>().unwrap(), f),
-            DATE_LIST => fmt::Debug::fmt(self.try_as_ref::<KDateList>().unwrap(), f),
-            DATE_TIME_LIST => fmt::Debug::fmt(self.try_as_ref::<KDateTimeList>().unwrap(), f),
-            TIMESPAN_LIST => fmt::Debug::fmt(self.try_as_ref::<KTimespanList>().unwrap(), f),
-            MINUTE_LIST => fmt::Debug::fmt(self.try_as_ref::<KMinuteList>().unwrap(), f),
-            SECOND_LIST => fmt::Debug::fmt(self.try_as_ref::<KSecondList>().unwrap(), f),
-            TIME_LIST => fmt::Debug::fmt(self.try_as_ref::<KTimeList>().unwrap(), f),
+            MIXED_LIST => fmt::Debug::fmt(<&KMixedList>::try_from(self).unwrap(), f),
+            BOOLEAN_ATOM => fmt::Debug::fmt(<&KBoolAtom>::try_from(self).unwrap(), f),
+            GUID_ATOM => fmt::Debug::fmt(<&KGuidAtom>::try_from(self).unwrap(), f),
+            BYTE_ATOM => fmt::Debug::fmt(<&KByteAtom>::try_from(self).unwrap(), f),
+            SHORT_ATOM => fmt::Debug::fmt(<&KShortAtom>::try_from(self).unwrap(), f),
+            INT_ATOM => fmt::Debug::fmt(<&KIntAtom>::try_from(self).unwrap(), f),
+            LONG_ATOM => fmt::Debug::fmt(<&KLongAtom>::try_from(self).unwrap(), f),
+            REAL_ATOM => fmt::Debug::fmt(<&KRealAtom>::try_from(self).unwrap(), f),
+            FLOAT_ATOM => fmt::Debug::fmt(<&KFloatAtom>::try_from(self).unwrap(), f),
+            CHAR_ATOM => fmt::Debug::fmt(<&KCharAtom>::try_from(self).unwrap(), f),
+            SYMBOL_ATOM => fmt::Debug::fmt(<&KSymbolAtom>::try_from(self).unwrap(), f),
+            TIMESTAMP_ATOM => fmt::Debug::fmt(<&KTimestampAtom>::try_from(self).unwrap(), f),
+            MONTH_ATOM => fmt::Debug::fmt(<&KMonthAtom>::try_from(self).unwrap(), f),
+            DATE_ATOM => fmt::Debug::fmt(<&KDateAtom>::try_from(self).unwrap(), f),
+            DATE_TIME_ATOM => fmt::Debug::fmt(<&KDateTimeAtom>::try_from(self).unwrap(), f),
+            TIMESPAN_ATOM => fmt::Debug::fmt(<&KTimespanAtom>::try_from(self).unwrap(), f),
+            MINUTE_ATOM => fmt::Debug::fmt(<&KMinuteAtom>::try_from(self).unwrap(), f),
+            SECOND_ATOM => fmt::Debug::fmt(<&KSecondAtom>::try_from(self).unwrap(), f),
+            TIME_ATOM => fmt::Debug::fmt(<&KBoolAtom>::try_from(self).unwrap(), f),
+            BOOLEAN_LIST => fmt::Debug::fmt(<&KBoolList>::try_from(self).unwrap(), f),
+            GUID_LIST => fmt::Debug::fmt(<&KGuidList>::try_from(self).unwrap(), f),
+            BYTE_LIST => fmt::Debug::fmt(<&KByteList>::try_from(self).unwrap(), f),
+            SHORT_LIST => fmt::Debug::fmt(<&KShortList>::try_from(self).unwrap(), f),
+            INT_LIST => fmt::Debug::fmt(<&KIntList>::try_from(self).unwrap(), f),
+            LONG_LIST => fmt::Debug::fmt(<&KLongList>::try_from(self).unwrap(), f),
+            REAL_LIST => fmt::Debug::fmt(<&KRealList>::try_from(self).unwrap(), f),
+            FLOAT_LIST => fmt::Debug::fmt(<&KFloatList>::try_from(self).unwrap(), f),
+            CHAR_LIST => fmt::Debug::fmt(<&KCharList>::try_from(self).unwrap(), f),
+            SYMBOL_LIST => fmt::Debug::fmt(<&KSymbolList>::try_from(self).unwrap(), f),
+            TIMESTAMP_LIST => fmt::Debug::fmt(<&KTimestampList>::try_from(self).unwrap(), f),
+            MONTH_LIST => fmt::Debug::fmt(<&KMonthList>::try_from(self).unwrap(), f),
+            DATE_LIST => fmt::Debug::fmt(<&KDateList>::try_from(self).unwrap(), f),
+            DATE_TIME_LIST => fmt::Debug::fmt(<&KDateTimeList>::try_from(self).unwrap(), f),
+            TIMESPAN_LIST => fmt::Debug::fmt(<&KTimespanList>::try_from(self).unwrap(), f),
+            MINUTE_LIST => fmt::Debug::fmt(<&KMinuteList>::try_from(self).unwrap(), f),
+            SECOND_LIST => fmt::Debug::fmt(<&KSecondList>::try_from(self).unwrap(), f),
+            TIME_LIST => fmt::Debug::fmt(<&KTimeList>::try_from(self).unwrap(), f),
             TABLE => write!(f, "table"),
             DICT => write!(f, "dict"),
-            ERROR => fmt::Debug::fmt(self.try_as_ref::<KError>().unwrap(), f),
+            ERROR => fmt::Debug::fmt(<&KError>::try_from(self).unwrap(), f),
             _ => write!(f, "Unknown"),
         }
     }

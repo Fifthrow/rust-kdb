@@ -11,5 +11,5 @@ fn main() {
     dict.insert(2i32, Symbol::try_from("Two").unwrap());
     dict.insert(3i32, Symbol::try_from("Three").unwrap());
 
-    println!("{:?}", **dict[2i32].try_as_ref::<KSymbolAtom>().unwrap());
+    println!("{:?}", <&KSymbolAtom>::try_from(&dict[2i32]).unwrap());
 }

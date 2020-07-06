@@ -29,6 +29,35 @@ impl Drop for KMixedList {
     }
 }
 
+impl TryFrom<&KAny> for &KMixedList {
+    type Error = ConversionError;
+
+    fn try_from(any: &KAny) -> Result<Self, Self::Error> {
+        let t = any.k_type();
+        if t == MIXED_LIST {
+            Ok(unsafe { &*(any as * const KAny as * const _) })
+        } else {
+            Err(ConversionError::InvalidKCast{ from: t, to: MIXED_LIST })
+        }
+    }
+}
+
+impl TryFrom<&Unowned<KAny>> for &KMixedList {
+    type Error = ConversionError;
+
+    fn try_from(any: &Unowned<KAny>) -> Result<Self, Self::Error> {
+        let t = any.k_type();
+        if t == MIXED_LIST {
+            Ok(unsafe { mem::transmute(any) })
+        } else {
+            Err(ConversionError::InvalidKCast {
+                from: t,
+                to: MIXED_LIST,
+            })
+        }
+    }
+}
+
 impl KListItem for KMixedList {
     type Item = KAny;
 }

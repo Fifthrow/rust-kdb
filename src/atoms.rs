@@ -86,6 +86,19 @@ macro_rules! impl_katom {
             }
         }
 
+        impl TryFrom<&Unowned<KAny>> for &$type {
+            type Error = ConversionError;
+
+            fn try_from(any: &Unowned<KAny>) -> Result<Self, Self::Error> {
+                let t = any.k_type();
+                if t == $k_type {
+                    Ok(unsafe { mem::transmute(any) })
+                } else {
+                    Err(ConversionError::InvalidKCast{ from: t, to: $k_type })
+                }
+            }
+        }
+        
         impl TryFrom<KAny> for $atom_type {
             type Error = ConversionError;
 
@@ -205,6 +218,30 @@ impl TryFrom<&KSymbolAtom> for &'static str {
     }
 }
 
+impl TryFrom<Unowned<KSymbolAtom>> for &'static str {
+    type Error = std::str::Utf8Error;
+    fn try_from(val: Unowned<KSymbolAtom>) -> Result<Self, Self::Error> {
+        let c_str = unsafe { CStr::from_ptr((*val.0).union.s) };
+        c_str.to_str()
+    }
+}
+
+impl TryFrom<KSymbolAtom> for &'static str {
+    type Error = std::str::Utf8Error;
+    fn try_from(val: KSymbolAtom) -> Result<Self, Self::Error> {
+        let c_str = unsafe { CStr::from_ptr((*val.0).union.s) };
+        c_str.to_str()
+    }
+}
+
+impl TryFrom<&Unowned<KSymbolAtom>> for &'static str {
+    type Error = std::str::Utf8Error;
+    fn try_from(val: &Unowned<KSymbolAtom>) -> Result<Self, Self::Error> {
+        let c_str = unsafe { CStr::from_ptr((*val.0).union.s) };
+        c_str.to_str()
+    }
+}
+
 impl TryFrom<Unowned<KSymbolAtom>> for String {
     type Error = std::str::Utf8Error;
     fn try_from(val: Unowned<KSymbolAtom>) -> Result<Self, Self::Error> {
@@ -228,13 +265,30 @@ impl TryFrom<String> for KAny {
     }
 }
 
-type S = &'static str;
-impl TryFrom<KAny> for &'static str {
+impl TryFrom<KAny> for &str {
     type Error = ConversionError;
 
     fn try_from(any: KAny) -> Result<Self, Self::Error> {
         let sym = KSymbolAtom::try_from(any)?;
-        S::try_from(*sym).map_err(ConversionError::from)
+        <&str>::try_from(*sym).map_err(ConversionError::from)
+    }
+}
+
+impl TryFrom<&KAny> for &str {
+    type Error = ConversionError;
+
+    fn try_from(any: &KAny) -> Result<Self, Self::Error> {
+        let sym = <&KSymbolAtom>::try_from(any)?;
+        <&str>::try_from(**sym).map_err(ConversionError::from)
+    }
+}
+
+impl TryFrom<Unowned<KAny>> for &str {
+    type Error = ConversionError;
+
+    fn try_from(any: Unowned<KAny>) -> Result<Self, Self::Error> {
+        let sym = <Unowned<KSymbolAtom>>::try_from(any)?;
+        <&str>::try_from(&*sym).map_err(ConversionError::from)
     }
 }
 
@@ -249,6 +303,32 @@ impl KError {
             }
             KError(k)
         })
+    }
+}
+
+impl TryFrom<&KAny> for &KError {
+    type Error = ConversionError;
+
+    fn try_from(any: &KAny) -> Result<Self, Self::Error> {
+        let t = any.k_type();
+        if t == ERROR {
+            Ok(unsafe { &*(any as * const KAny as * const KError) })
+        } else {
+            Err(ConversionError::InvalidKCast{ from: t, to: ERROR })
+        }
+    }
+}
+
+impl TryFrom<&Unowned<KAny>> for &KError {
+    type Error = ConversionError;
+
+    fn try_from(any: &Unowned<KAny>) -> Result<Self, Self::Error> {
+        let t = any.k_type();
+        if t == ERROR {
+            Ok(unsafe { mem::transmute(any)})
+        } else {
+            Err(ConversionError::InvalidKCast{ from: t, to: ERROR })
+        }
     }
 }
 

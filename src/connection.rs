@@ -29,7 +29,7 @@ macro_rules! evaluate {
                 let err = KError(result).into();
                 Err(err)
             } else {
-                Ok(result)
+                Ok(KAny(result))
             }
         }
     };
@@ -73,17 +73,17 @@ impl Connection {
 
     /// Evaluate a q expression with no parameters and return a result
     pub fn eval(&self, query: &str) -> Result<KAny, Error> {
-        evaluate!(self.0, query).map(KAny)
+        evaluate!(self.0, query)
     }
 
     /// Evaluate a q function with a single parameter and return the result
     pub fn eval_1(&self, function: &str, param: impl Into<KAny>) -> Result<KAny, Error> {
-        evaluate!(self.0, function, param.into()).map(KAny)
+        evaluate!(self.0, function, param.into())
     }
 
     /// Evaluate a q function with two parameters and return the result
     pub fn eval_2(&self, function: &str, param: impl Into<KAny>, param_2: impl Into<KAny>) -> Result<KAny, Error> {
-        evaluate!(self.0, function, param.into(), param_2.into()).map(KAny)
+        evaluate!(self.0, function, param.into(), param_2.into())
     }
 
     /// Evaluate a q function with three parameters and return the result
@@ -94,7 +94,7 @@ impl Connection {
         param_2: impl Into<KAny>,
         param_3: impl Into<KAny>,
     ) -> Result<KAny, Error> {
-        evaluate!(self.0, function, param.into(), param_2.into(), param_3.into()).map(KAny)
+        evaluate!(self.0, function, param.into(), param_2.into(), param_3.into())
     }
 
     /// Evaluate a q function with four parameters and return the result
@@ -114,7 +114,6 @@ impl Connection {
             param_3.into(),
             param_4.into()
         )
-        .map(KAny)
     }
 
     /// Evaluate a q function with five parameters and return the result
@@ -136,7 +135,6 @@ impl Connection {
             param_4.into(),
             param_5.into()
         )
-        .map(KAny)
     }
 
     /// Evaluate a q function with six parameters and return the result
@@ -160,7 +158,6 @@ impl Connection {
             param_5.into(),
             param_6.into()
         )
-        .map(KAny)
     }
 
     /// Evaluate a q function with seven parameters and return the result
@@ -186,7 +183,6 @@ impl Connection {
             param_6.into(),
             param_7.into()
         )
-        .map(KAny)
     }
 
     /// See above and add one parameter.
@@ -214,7 +210,6 @@ impl Connection {
             param_7.into(),
             param_8.into()
         )
-        .map(KAny)
     }
 }
 

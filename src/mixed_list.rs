@@ -35,9 +35,12 @@ impl TryFrom<&KAny> for &KMixedList {
     fn try_from(any: &KAny) -> Result<Self, Self::Error> {
         let t = any.k_type();
         if t == MIXED_LIST {
-            Ok(unsafe { &*(any as * const KAny as * const _) })
+            Ok(unsafe { &*(any as *const KAny as *const _) })
         } else {
-            Err(ConversionError::InvalidKCast{ from: t, to: MIXED_LIST })
+            Err(ConversionError::InvalidKCast {
+                from: t,
+                to: MIXED_LIST,
+            })
         }
     }
 }
@@ -82,6 +85,11 @@ impl KMixedList {
     pub fn new() -> Self {
         unsafe { KMixedList(kapi::ktn(MIXED_LIST.into(), 0)) }
     }
+}
+
+#[doc(hidden)]
+pub unsafe fn mixed_list_from_raw(k: *const K) -> KMixedList {
+    KMixedList(k)
 }
 
 impl fmt::Debug for KMixedList {
@@ -154,15 +162,6 @@ impl<T: Into<KAny>> FromIterator<T> for KMixedList {
     }
 }
 
-/*impl<'a> FromIterator<&'a KAny> for KMixedList {
-    fn from_iter<I: IntoIterator<Item = &'a KAny>>(iter: I) -> Self {
-
-        KMixedList(list(MIXED_LIST, iter, |mut k, item| unsafe {
-            kapi::jk(&mut k, item as *const _ as *const _) as *mut K
-        }))
-    }
-}*/
-
 impl From<KMixedList> for KAny {
     fn from(item: KMixedList) -> KAny {
         unsafe { mem::transmute(item) }
@@ -187,7 +186,7 @@ impl TryFrom<KAny> for KMixedList {
 
 impl From<Unowned<KMixedList>> for KMixedList {
     fn from(item: Unowned<KMixedList>) -> KMixedList {
-        KMixedList(unsafe { item.clone_k_ptr() })
+        KMixedList(item.clone_k_ptr())
     }
 }
 

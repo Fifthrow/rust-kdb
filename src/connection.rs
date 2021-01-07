@@ -5,12 +5,11 @@
 
 use crate::any::KAny;
 use crate::atoms::KError;
-use crate::error::{ConnectionError, Error};
+use crate::error::Error;
 use crate::raw::kapi;
 use crate::raw::types::{ERROR, I, K};
 use std::ffi::CString;
 use std::ptr;
-use std::time::Duration;
 
 fn null() -> *const K {
     ptr::null()
@@ -35,6 +34,7 @@ macro_rules! evaluate {
     };
 }
 
+#[derive(Debug)]
 pub struct Connection(I);
 
 impl Connection {
@@ -43,8 +43,9 @@ impl Connection {
         hostname: &str,
         port: u16,
         credentials: &str,
-        timeout: Option<Duration>,
-    ) -> Result<Self, ConnectionError> {
+        timeout: Option<std::time::Duration>,
+    ) -> Result<Self, crate::error::ConnectionError> {
+        use crate::error::ConnectionError;
         let c_hostname = CString::new(hostname).unwrap();
         let c_credentials = CString::new(credentials).unwrap();
 

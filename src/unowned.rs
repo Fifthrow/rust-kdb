@@ -6,6 +6,7 @@ use std::mem::ManuallyDrop;
 use std::ops::{Deref, DerefMut};
 
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct Unowned<T>(ManuallyDrop<T>);
 
 impl<T> Deref for Unowned<T> {
@@ -24,9 +25,7 @@ impl<T> DerefMut for Unowned<T> {
 
 impl<T: KItem> Unowned<T> {
     pub fn to_owned(self) -> T {
-        unsafe {
-            self.0.clone_k_ptr();
-        }
+        self.0.clone_k_ptr();
         ManuallyDrop::into_inner(self.0)
     }
 }

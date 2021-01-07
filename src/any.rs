@@ -4,9 +4,9 @@ use crate::lists::*;
 use crate::mixed_list::KMixedList;
 use crate::raw::kapi;
 use crate::raw::types::*;
+use std::convert::TryFrom;
 use std::fmt;
 use std::mem;
-use std::convert::TryFrom;
 
 /// KAny wraps the core K type safely. It can be converted into more specific wrappers
 /// that offer more useful functionality using standard rust conversions (TryFrom) or
@@ -15,7 +15,7 @@ use std::convert::TryFrom;
 pub struct KAny(pub(crate) *const K);
 
 impl KAny {
-    pub(crate) fn into_ptr(self) -> *const K {
+    pub fn into_ptr(self) -> *const K {
         mem::ManuallyDrop::new(self).as_k_ptr()
     }
 

@@ -11,6 +11,7 @@ use std::mem;
 use std::ops::Index;
 
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct KDict(*const K);
 
 impl KItem for KDict {
@@ -52,6 +53,10 @@ impl KDict {
 
     fn value_list(&self) -> &KMixedList {
         &self.raw_key_value_lists()[1]
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     pub fn len(&self) -> usize {
@@ -162,7 +167,7 @@ where
 
 impl From<Unowned<KDict>> for KDict {
     fn from(item: Unowned<KDict>) -> KDict {
-        KDict(unsafe { item.clone_k_ptr() })
+        KDict(item.clone_k_ptr())
     }
 }
 

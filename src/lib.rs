@@ -26,10 +26,31 @@ pub use connection::Connection;
 pub use dict::KDict;
 pub use error::{ConnectionError, ConversionError, Error};
 pub use lists::*;
-pub use mixed_list::KMixedList;
+pub use mixed_list::{mixed_list_from_raw, KMixedList};
 pub use raw::types::*;
 pub use table::KTable;
 pub use unowned::Unowned;
 pub mod c_api {
     pub use crate::raw::kapi::*;
+}
+
+#[macro_export(local_inner_macros)]
+macro_rules! count_items {
+    ($name:expr) => { 1 };
+    ($first:expr, $($rest:expr),*) => {
+        1 + count_items!($($rest),*)
+    }
+}
+
+#[macro_export]
+macro_rules! mixed_list {
+    ($($x:expr),+ $(,)?) => {
+        {
+            unsafe { $crate::mixed_list_from_raw($crate::raw::kapi::knk($crate::count_items!($($x),*), $($crate::KAny::from($x).into_ptr()),*)) }
+        }
+    };
+}
+
+pub fn symbol(sym: &'static str) -> Symbol {
+    std::convert::TryFrom::try_from(sym).unwrap()
 }

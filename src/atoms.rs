@@ -12,8 +12,8 @@ pub trait KItem {
     const K_TYPE: KType;
     fn as_k_ptr(&self) -> *const K;
 
-    unsafe fn clone_k_ptr(&self) -> *const K {
-        kapi::r1(self.as_k_ptr())
+    fn clone_k_ptr(&self) -> *const K {
+        unsafe { kapi::r1(self.as_k_ptr()) }
     }
 
     fn k_type(&self) -> KType {
@@ -98,7 +98,7 @@ macro_rules! impl_katom {
                 }
             }
         }
-        
+
         impl TryFrom<KAny> for $atom_type {
             type Error = ConversionError;
 
@@ -128,7 +128,7 @@ macro_rules! impl_katom {
 
         impl From<Unowned<$type>> for $type {
             fn from(item: Unowned<$type>) -> $type {
-                $type(unsafe { item.clone_k_ptr() })
+                $type(item.clone_k_ptr())
             }
         }
 
@@ -138,8 +138,7 @@ macro_rules! impl_katom {
             }
         }
 
-        impl TryFrom<Unowned<KAny>> for Unowned<$type>
-        {
+        impl TryFrom<Unowned<KAny>> for Unowned<$type> {
             type Error = ConversionError;
 
             fn try_from(any: Unowned<KAny>) -> Result<Self, Self::Error> {
@@ -312,9 +311,9 @@ impl TryFrom<&KAny> for &KError {
     fn try_from(any: &KAny) -> Result<Self, Self::Error> {
         let t = any.k_type();
         if t == ERROR {
-            Ok(unsafe { &*(any as * const KAny as * const KError) })
+            Ok(unsafe { &*(any as *const KAny as *const KError) })
         } else {
-            Err(ConversionError::InvalidKCast{ from: t, to: ERROR })
+            Err(ConversionError::InvalidKCast { from: t, to: ERROR })
         }
     }
 }
@@ -325,9 +324,9 @@ impl TryFrom<&Unowned<KAny>> for &KError {
     fn try_from(any: &Unowned<KAny>) -> Result<Self, Self::Error> {
         let t = any.k_type();
         if t == ERROR {
-            Ok(unsafe { mem::transmute(any)})
+            Ok(unsafe { mem::transmute(any) })
         } else {
-            Err(ConversionError::InvalidKCast{ from: t, to: ERROR })
+            Err(ConversionError::InvalidKCast { from: t, to: ERROR })
         }
     }
 }
@@ -397,7 +396,7 @@ impl From<KError> for crate::error::Error {
 
 impl From<Unowned<KError>> for KError {
     fn from(item: Unowned<KError>) -> KError {
-        KError(unsafe { item.clone_k_ptr() })
+        KError(item.clone_k_ptr())
     }
 }
 

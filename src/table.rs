@@ -9,6 +9,7 @@ use std::convert::TryFrom;
 use std::mem;
 
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct KTable(*const K);
 
 impl KTable {
@@ -68,7 +69,7 @@ impl Drop for KTable {
 */
 impl From<Unowned<KTable>> for KTable {
     fn from(item: Unowned<KTable>) -> KTable {
-        KTable(unsafe { item.clone_k_ptr() })
+        KTable(item.clone_k_ptr())
     }
 }
 

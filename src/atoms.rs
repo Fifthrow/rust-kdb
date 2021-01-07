@@ -92,7 +92,7 @@ macro_rules! impl_katom {
             fn try_from(any: &Unowned<KAny>) -> Result<Self, Self::Error> {
                 let t = any.k_type();
                 if t == $k_type {
-                    Ok(unsafe { mem::transmute(any) })
+                    Ok(unsafe {  &*(any as * const _ as * const $type) })
                 } else {
                     Err(ConversionError::InvalidKCast{ from: t, to: $k_type })
                 }
@@ -324,7 +324,7 @@ impl TryFrom<&Unowned<KAny>> for &KError {
     fn try_from(any: &Unowned<KAny>) -> Result<Self, Self::Error> {
         let t = any.k_type();
         if t == ERROR {
-            Ok(unsafe { mem::transmute(any) })
+            Ok(unsafe { &*(any as *const _ as *const _) })
         } else {
             Err(ConversionError::InvalidKCast { from: t, to: ERROR })
         }

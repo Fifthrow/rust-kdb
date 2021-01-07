@@ -51,7 +51,7 @@ impl TryFrom<&Unowned<KAny>> for &KMixedList {
     fn try_from(any: &Unowned<KAny>) -> Result<Self, Self::Error> {
         let t = any.k_type();
         if t == MIXED_LIST {
-            Ok(unsafe { mem::transmute(any) })
+            Ok(unsafe { &*(any as *const _ as *const _) })
         } else {
             Err(ConversionError::InvalidKCast {
                 from: t,

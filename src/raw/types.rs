@@ -256,11 +256,10 @@ impl fmt::Debug for K {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(
             f,
-            "K{{ {k_type:?}, {attrs:?}, ref_count = {r}, value = {value}}}",
+            "K{{ {k_type:?}, {attrs:?}, ref_count = {r}, value = ... }}",
             k_type = self.t,
             attrs = self.u,
             r = self.r,
-            value = "..." //self.debug_value_str()
         )?;
         Ok(())
     }

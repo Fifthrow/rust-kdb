@@ -43,6 +43,10 @@ pub trait KListItem: KItem {
         unsafe { (*self.as_k_ptr()).union.list.n as usize }
     }
 
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     fn get(&self, index: usize) -> Option<&Self::Item> {
         if index >= self.len() {
             return None;
@@ -196,13 +200,13 @@ macro_rules! impl_klist {
             fn try_from(any: &Unowned<KAny>) -> Result<Self, Self::Error> {
                     let t = any.k_type();
                     if t == $k_type {
-                        Ok(unsafe { mem::transmute(any) })
+                        Ok(unsafe { &*(any as *const _ as *const _) })
                     } else {
                         Err(ConversionError::InvalidKCast{ from: t, to: $k_type })
                     }
             }
         }
-        
+
         impl TryFrom<KAny> for $type
         {
             type Error = ConversionError;
@@ -219,7 +223,7 @@ macro_rules! impl_klist {
 
         impl From<Unowned<$type>> for $type {
             fn from(item: Unowned<$type>) -> $type {
-                $type(unsafe { item.clone_k_ptr() })
+                $type(item.clone_k_ptr())
             }
         }
 

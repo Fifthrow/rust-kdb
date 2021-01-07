@@ -139,6 +139,7 @@ impl Connection {
     }
 
     /// Evaluate a q function with six parameters and return the result
+    #[allow(clippy::too_many_arguments)]
     pub fn eval_6(
         &self,
         function: &str,
@@ -162,6 +163,7 @@ impl Connection {
     }
 
     /// Evaluate a q function with seven parameters and return the result
+    #[allow(clippy::too_many_arguments)]
     pub fn eval_7(
         &self,
         function: &str,
@@ -187,6 +189,7 @@ impl Connection {
     }
 
     /// See above and add one parameter.
+    #[allow(clippy::too_many_arguments)]
     pub fn eval_8(
         &self,
         function: &str,

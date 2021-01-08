@@ -24,14 +24,14 @@ impl<T> DerefMut for Unowned<T> {
 }
 
 impl<T: KItem> Unowned<T> {
-    pub fn to_owned(self) -> T {
+    pub fn into_owned(self) -> T {
         self.0.clone_k_ptr();
         ManuallyDrop::into_inner(self.0)
     }
 }
 
 impl Unowned<KAny> {
-    pub fn to_owned(self) -> KAny {
+    pub fn into_owned(self) -> KAny {
         unsafe {
             kapi::r1(self.0.as_k_ptr());
         }

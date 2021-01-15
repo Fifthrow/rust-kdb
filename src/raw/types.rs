@@ -542,13 +542,13 @@ impl Timestamp {
 
 impl From<i64> for Timestamp {
     fn from(val: i64) -> Timestamp {
-        Timestamp(val - K_NANO_OFFSET)
+        Timestamp(val)
     }
 }
 
 impl From<Timestamp> for i64 {
     fn from(val: Timestamp) -> i64 {
-        val.0 + K_NANO_OFFSET
+        val.0
     }
 }
 

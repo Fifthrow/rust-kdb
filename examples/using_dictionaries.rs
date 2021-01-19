@@ -1,15 +1,15 @@
 extern crate kdb;
 
-use kdb::{KDict, KSymbolAtom, Symbol};
+use kdb::{symbol, Atom, KBox, Symbol};
 use std::convert::TryFrom;
 
 fn main() {
     //Symbols use a lot of try_into. Sad.
-    let mut dict = KDict::new();
+    let mut dict = KBox::new_dict();
 
-    dict.insert(1i32, Symbol::try_from("One").unwrap());
-    dict.insert(2i32, Symbol::try_from("Two").unwrap());
-    dict.insert(3i32, Symbol::try_from("Three").unwrap());
+    dict.insert(1i32, symbol("One"));
+    dict.insert(2i32, symbol("Two"));
+    dict.insert(3i32, symbol("Three"));
 
-    println!("{:?}", <&KSymbolAtom>::try_from(&dict[2i32]).unwrap());
+    println!("{:?}", <&Atom<Symbol>>::try_from(&dict[2i32]).unwrap());
 }

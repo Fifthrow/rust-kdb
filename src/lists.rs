@@ -25,7 +25,7 @@ where
 {
     let iter: I::IntoIter = iter.into_iter();
     let mut k = unsafe { kapi::ktn(kind.into(), iter.size_hint().0 as i64) as *mut K };
-    let slice = unsafe { as_mut_slice(k) };
+    let slice = unsafe { as_slice_mut(k) };
     iter.enumerate().for_each(|(i, s)| {
         if i < slice.len() {
             slice[i] = s;

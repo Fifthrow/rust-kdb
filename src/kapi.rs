@@ -1,10 +1,7 @@
-use super::types::*;
+use crate::guid::Guid;
+use crate::k::{F, I, J, K, S, V};
 
 pub type KCallback = extern "C" fn(arg1: I) -> *const K;
-
-pub const K_NANO_OFFSET: i64 = 946_684_800_000_000_000;
-pub const K_SEC_OFFSET: i64 = K_NANO_OFFSET / 1_000_000_000;
-pub const K_DAY_OFFSET: i32 = (K_SEC_OFFSET / 86_400) as i32;
 
 pub const K_TYPE_TIMESTAMP: i32 = -12;
 pub const K_TYPE_TIMESPAN: i32 = -16;
@@ -26,33 +23,32 @@ extern "C" {
     pub fn dl(f: *mut V, n: I) -> *const K;
     pub fn dot(x: K, y: K) -> *const K;
 
-    pub fn ee(x: *const K) -> *const K;
+    pub fn ee(x: *mut K) -> *mut K;
 
-    pub fn ja(list: *mut *mut K, atom: *const V) -> *const K;
-    pub fn js(list: *mut *mut K, symbol: S) -> *const K;
-    pub fn jk(list: *mut *mut K, k: *const K) -> *const K;
-    pub fn jv(list1: *mut *mut K, list2: *const K) -> *const K;
+    pub fn ja(list: *mut *mut K, atom: *const V) -> *mut K;
+    pub fn js(list: *mut *mut K, symbol: S) -> *mut K;
+    pub fn jk(list: *mut *mut K, k: *const K) -> *mut K;
+    pub fn jv(list1: *mut *mut K, list2: *const K) -> *mut K;
 
-    pub fn k(handle: I, query: S, ...) -> *const K;
-    pub fn ka(k_type: I) -> *const K;
-    pub fn kb(boolean: I) -> *const K;
-    pub fn kc(c_char: I) -> *const K;
-    pub fn kd(date: I) -> *const K;
-    pub fn ke(real: F) -> *const K;
-    pub fn kf(float: F) -> *const K;
-    pub fn kg(byte: I) -> *const K;
-    pub fn kh(short: I) -> *const K;
-    pub fn ki(int: I) -> *const K;
-    pub fn kj(long: J) -> *const K;
-    pub fn kp(c_str: S) -> *const K;
-    pub fn kpn(c_str: S, len: J) -> *const K;
-    pub fn krr(c_str: S) -> *const K;
-    pub fn ks(c_str: S) -> *const K;
-    pub fn kt(time: I) -> *const K;
+    pub fn k(handle: I, query: S, ...) -> *mut K;
+    pub fn ka(k_type: I) -> *mut K;
+    pub fn kb(boolean: I) -> *mut K;
+    pub fn kc(c_char: I) -> *mut K;
+    pub fn kd(date: I) -> *mut K;
+    pub fn ke(real: F) -> *mut K;
+    pub fn kf(float: F) -> *mut K;
+    pub fn kg(byte: I) -> *mut K;
+    pub fn kh(short: I) -> *mut K;
+    pub fn ki(int: I) -> *mut K;
+    pub fn kj(long: J) -> *mut K;
+    pub fn kp(c_str: S) -> *mut K;
+    pub fn kpn(c_str: S, len: J) -> *mut K;
+    pub fn krr(c_str: S) -> *mut K;
+    pub fn ks(c_str: S) -> *mut K;
+    pub fn kt(time: I) -> *mut K;
     pub fn ktd(keyed_table: *const K) -> *const K;
     pub fn ktj(begin: I, end: J) -> *const K;
-    pub fn ktn(k_type: I, len: J) -> *const K;
-    pub fn knk(arg1: I, ...) -> *const K;
+    pub fn ktn(k_type: I, len: J) -> *mut K;
     pub fn ku(guid: Guid) -> *const K;
     pub fn kz(date_time: F) -> *const K;
 
@@ -61,8 +57,8 @@ extern "C" {
     pub fn orr(c_str: S) -> *const K;
     pub fn okx(x: *const K) -> I;
 
-    pub fn r0(k: *const K) -> V;
-    pub fn r1(k: *const K) -> *const K;
+    pub fn r0(k: *mut K) -> V;
+    pub fn r1(k: *mut K) -> *mut K;
 
     pub fn sd1(d: I, cb: Option<KCallback>) -> *const K;
     pub fn sd0(d: I) -> V;

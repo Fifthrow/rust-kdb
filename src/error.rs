@@ -1,11 +1,11 @@
-use crate::raw::types::KType;
+use crate::k_type::KTypeCode;
 use std::str::Utf8Error;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum ConversionError {
     #[error("Invalid k object cast from {from} to {to}")]
-    InvalidKCast { from: KType, to: KType },
+    InvalidKCast { from: KTypeCode, to: KTypeCode },
     #[error("Duration too long for K timespan type")]
     DurationTooLong,
     #[error("Symbol not a valid Rust string")]

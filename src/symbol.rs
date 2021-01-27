@@ -66,12 +66,21 @@ impl Symbol {
     /// Attempts to convert to a valid utf-8 string.
     /// This will return an error if the string contains invalid utf-8 characters.
     /// This function does not allocate.
-    pub fn try_to_string(&self) -> Result<&'static str, ConversionError> {
+    pub fn try_as_str(&self) -> Result<&'static str, ConversionError> {
         Ok(unsafe { CStr::from_ptr(self.0).to_str()? })
+    }
+
+    /// Converts the symbol to a rust str without checking if it is valid.
+    ///
+    /// # Safety
+    ///
+    /// The string must be valid UTF-8.
+    /// It's length must be less than or equal to isize::MAX.
+    pub unsafe fn as_str_unchecked(&self) -> &'static str {
+        std::str::from_utf8_unchecked(CStr::from_ptr(self.0).to_bytes())
     }
 }
 
-// TODO: safety warning - need to do this in some private way. Might need to reimplement SymbolAtom manually instead of via macro
 impl From<Symbol> for *const i8 {
     fn from(sym: Symbol) -> Self {
         sym.0
@@ -94,10 +103,8 @@ impl fmt::Display for Symbol {
     }
 }
 
-/// Helper for succinctly creating a symbol.
-/// If the string passed in is not a valid symbol,
-/// meaning it contains embedded nuls,
-/// then it will panic.
+/// Helper for succinctly creating a symbol. If the string passed in is not a valid symbol,
+/// i.e. it contains embedded nuls, then this function will panic.
 pub fn symbol(s: &str) -> Symbol {
     Symbol::new(s).unwrap()
 }

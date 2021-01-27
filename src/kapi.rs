@@ -1,3 +1,5 @@
+//! Provides ffi definitions for the KDB C API.
+
 use crate::guid::Guid;
 use crate::k::{F, I, J, K, S, V};
 

@@ -6,6 +6,7 @@ use crate::symbol::symbol;
 use crate::type_traits::KObject;
 use crate::{error::Error, k::K};
 
+/// Represents an error in KDB.
 pub struct KError {
     k: K,
 }

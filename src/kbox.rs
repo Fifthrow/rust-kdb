@@ -15,9 +15,7 @@ pub struct KBox<T: KObject> {
 impl<T: KObject> KBox<T> {
     /// Converts a box into a raw unmanged K pointer.
     /// Note that into raw will consume the KBox, and not call
-    /// r0.
-    /// This is useful if you want to return a raw K object from a
-    /// function. This will allow you to do so without dropping it.
+    /// r0, so it's possible to leak memory by doing this.
     pub fn into_raw(self) -> *mut T {
         ManuallyDrop::new(self).k
     }

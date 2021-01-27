@@ -27,6 +27,18 @@ unsafe fn as_slice<'a, T>(k: *const K) -> &'a [T] {
     slice::from_raw_parts(&list.g0 as *const _ as *const _, list.n as usize)
 }
 
+/// Lists are the KDB equivalent of Rust's `Vec`. They contain collections of values
+/// and their contents be looked up by index.
+///
+/// # Examples
+/// let mut l: KBox<List<i32>> = [1, 2, 3, 4, 5].into_iter().collect();
+/// l.push(6);
+/// let sl = &l[..]; // we can take slices and use them like other rust slices.
+/// println!("{}", sl.iter().copied().sum());
+///
+/// Notes for best performance: using collect() to create a list will typically result in better performance
+/// than using `new` and `push`. This is because collect will, where possible, allocate a list large enough for
+/// all items up front. push will reallocate whenever needed.
 #[repr(transparent)]
 pub struct List<T> {
     k: K,

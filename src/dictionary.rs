@@ -9,7 +9,6 @@ pub struct Dictionary {
     k: K,
 }
 
-//TODO: Check array alignment is defined as per C.
 impl Dictionary {
     fn raw_key_value_lists(&self) -> &[KBox<List<Any>>; 2] {
         unsafe {
@@ -43,23 +42,25 @@ impl Dictionary {
         &self.raw_key_value_lists()[1]
     }
 
+    /// The number of items in the dictionary.
     #[inline]
     pub fn len(&self) -> usize {
         self.key_list().len()
     }
 
+    /// Returns true if the dictionary has no items.
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
-    /// Gets a slice containing all the keys in this dictionary
+    /// Gets a slice containing all the keys in this dictionary.
     #[inline]
     pub fn keys(&self) -> &[KBox<Any>] {
         &self.key_list()[..]
     }
 
-    /// Gets a slice containing all the values in this dictionary
+    /// Gets a slice containing all the values in this dictionary.
     #[inline]
     pub fn values(&self) -> &[KBox<Any>] {
         &self.value_list()[..]
@@ -88,6 +89,7 @@ impl Dictionary {
         self.values().get(index)
     }
 
+    /// An iterator through every value in the KDB object
     #[inline]
     pub fn iter(&self) -> impl Iterator<Item = (&KBox<Any>, &KBox<Any>)> {
         self.keys().iter().zip(self.values().iter())

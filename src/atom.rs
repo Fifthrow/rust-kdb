@@ -8,8 +8,17 @@ use std::fmt;
 use std::marker::PhantomData;
 use std::mem;
 
-/// Represents a K Atom. It's underlying value (if it has one) can be accessed using the value() method.
-/// and raw types can be converted directly into Atoms.
+/// Atoms are the base primitive values in rust-kdb. You can create a new atom by calling
+/// `KBox::new_atom`, or using the `From`/`Into` traits on a value.
+/// 
+/// # Examples
+/// ```
+/// use kdb::{KBox, Atom};
+///
+/// let a = KBox::new(42u8); // Creates a KBox<Atom<u8>>
+/// let b: KBox<Atom<u8>> = 27u8.into();
+/// println!("{} dudes!", a.value() + b.value());
+/// ```
 #[repr(transparent)]
 pub struct Atom<T> {
     k: K,
@@ -17,7 +26,7 @@ pub struct Atom<T> {
 }
 
 impl<T: KValue> Atom<T> {
-    // Returns a copy of the primitive stored in the atom.
+    /// Returns a copy of the value stored in the atom.
     pub fn value(&self) -> T {
         unsafe { T::from_k(&self.k) }
     }
@@ -89,6 +98,7 @@ impl_atom_from!(Timestamp);
 impl_atom_from!(Timespan);
 
 impl<T: KValue> KBox<Atom<T>> {
+    /// Creates a new atom with the specified value.
     #[inline]
     pub fn new_atom(value: T) -> KBox<Atom<T>> {
         unsafe { mem::transmute(value.into_k()) }

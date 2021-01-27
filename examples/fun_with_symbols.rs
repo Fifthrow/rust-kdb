@@ -16,7 +16,7 @@ fn main() {
 
     // We cannot directly display a KDB symbol as, unlike like rust strings, they do not have to be
     // Utf8 encoded.
-    println!("{}", sym.try_to_string().unwrap());
+    println!("{}", sym.try_as_str().unwrap());
 
     //As a compromise we can use debug, which will attempt to display it or display
     // <invalid rust string> if it is invalid.

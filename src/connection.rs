@@ -14,6 +14,7 @@ use crate::kbox::KBox;
 use std::ffi::CString;
 use std::ptr;
 
+/// null pointer with type inferred as *const K.
 fn null() -> *const K {
     ptr::null()
 }
@@ -41,9 +42,12 @@ fn from_raw(k: *mut K) -> KBox<Any> {
     unsafe { KBox::from_raw(k) }
 }
 
+/// Represents a connection to a remote or embedded KDB instance,
+/// which can be used to send and query data on that instance.
 pub struct Connection(i32);
 
 impl Connection {
+    /// Connect to a remote instance of KDB.
     #[cfg(not(feature = "embedded"))]
     pub fn connect(
         hostname: &str,
@@ -69,31 +73,35 @@ impl Connection {
         }
     }
 
-    #[cfg(feature = "embedded")]
+    /// [embedded only] Connect to an embedded KDB instance.
+    #[cfg(any(feature = "embedded", doc))]
     pub fn new() -> Self {
         Connection(0)
     }
 
+    /// Publish a value asynchronously to KDB.
     pub fn publish(
         &self,
         callback: &str,
         topic: impl Into<KBox<Any>>,
         object: impl Into<KBox<Any>>,
     ) -> Result<(), Error> {
+        // Note that when sending asynchronously, we shouldn't call r0 on the return value - it's
+        // not an owned K type.
         evaluate!(-self.0, callback, topic.into(), object.into()).map(|_| ())
     }
 
-    /// Evaluate a q expression with no parameters and return a result
+    /// Evaluate a q expression with no parameters and return a result.
     pub fn eval(&self, query: &str) -> Result<KBox<Any>, Error> {
         evaluate!(self.0, query).map(from_raw)
     }
 
-    /// Evaluate a q function with a single parameter and return the result
+    /// Evaluate a q function with a single parameter and return the result.
     pub fn eval_1(&self, function: &str, param: impl Into<KBox<Any>>) -> Result<KBox<Any>, Error> {
         evaluate!(self.0, function, param.into()).map(from_raw)
     }
 
-    /// Evaluate a q function with two parameters and return the result
+    /// Evaluate a q function with two parameters and return the result.
     pub fn eval_2(
         &self,
         function: &str,
@@ -103,7 +111,7 @@ impl Connection {
         evaluate!(self.0, function, param.into(), param_2.into()).map(from_raw)
     }
 
-    /// Evaluate a q function with three parameters and return the result
+    /// Evaluate a q function with three parameters and return the result.
     pub fn eval_3(
         &self,
         function: &str,
@@ -114,7 +122,7 @@ impl Connection {
         evaluate!(self.0, function, param.into(), param_2.into(), param_3.into()).map(from_raw)
     }
 
-    /// Evaluate a q function with four parameters and return the result
+    /// Evaluate a q function with four parameters and return the result.
     pub fn eval_4(
         &self,
         function: &str,
@@ -134,7 +142,7 @@ impl Connection {
         .map(from_raw)
     }
 
-    /// Evaluate a q function with five parameters and return the result
+    /// Evaluate a q function with five parameters and return the result.
     pub fn eval_5(
         &self,
         function: &str,
@@ -156,7 +164,7 @@ impl Connection {
         .map(from_raw)
     }
 
-    /// Evaluate a q function with six parameters and return the result
+    /// Evaluate a q function with six parameters and return the result.
     #[allow(clippy::clippy::too_many_arguments)]
     pub fn eval_6(
         &self,
@@ -181,7 +189,7 @@ impl Connection {
         .map(from_raw)
     }
 
-    /// Evaluate a q function with seven parameters and return the result
+    /// Evaluate a q function with seven parameters and return the result.
     #[allow(clippy::clippy::too_many_arguments)]
     pub fn eval_7(
         &self,

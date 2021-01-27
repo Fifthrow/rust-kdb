@@ -2,10 +2,11 @@ use std::convert::TryFrom;
 use std::fmt;
 use std::time::{Duration, SystemTime};
 
-pub const K_NANO_OFFSET: i64 = 946_684_800_000_000_000;
-pub const K_SEC_OFFSET: i64 = K_NANO_OFFSET / 1_000_000_000;
-pub const K_DAY_OFFSET: i32 = (K_SEC_OFFSET / 86_400) as i32;
+pub(crate) const K_NANO_OFFSET: i64 = 946_684_800_000_000_000;
+pub(crate) const K_SEC_OFFSET: i64 = K_NANO_OFFSET / 1_000_000_000;
+pub(crate) const K_DAY_OFFSET: i32 = (K_SEC_OFFSET / 86_400) as i32;
 
+/// Represents a number of seconds
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct Second(i32);
@@ -33,6 +34,8 @@ impl fmt::Debug for Second {
     }
 }
 
+
+/// Represents a number of minutes.
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct Minute(i32);
@@ -60,18 +63,19 @@ impl fmt::Debug for Minute {
     }
 }
 
+/// Represents a date in the KDB Epoch
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
 pub struct Date(i32);
 impl From<i32> for Date {
     fn from(val: i32) -> Date {
-        Date(val - K_DAY_OFFSET)
+        Date(val)
     }
 }
 
 impl From<Date> for i32 {
     fn from(val: Date) -> i32 {
-        val.0 + K_DAY_OFFSET
+        val.0
     }
 }
 
@@ -90,6 +94,7 @@ impl From<Date> for SystemTime {
     }
 }
 
+/// Represents a Month value in KDB
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct Month(i32);
@@ -117,6 +122,8 @@ impl fmt::Debug for Month {
     }
 }
 
+
+//Represents a time in KDB
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
 pub struct Time(i32);
@@ -132,19 +139,22 @@ impl From<Time> for i32 {
     }
 }
 
+
+/// Represents a date and time in KDB. Conversions between the
+/// Unix Epoch and the KDB Epoch are done automatically.
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
 pub struct DateTime(f64);
 
 impl From<f64> for DateTime {
     fn from(val: f64) -> DateTime {
-        DateTime(val - K_SEC_OFFSET as f64)
+        DateTime(val)
     }
 }
 
 impl From<DateTime> for f64 {
     fn from(val: DateTime) -> f64 {
-        val.0 + K_SEC_OFFSET as f64
+        val.0
     }
 }
 
@@ -162,23 +172,29 @@ impl From<SystemTime> for DateTime {
     }
 }
 
+/// Represents a timestamp in KDB. Conversions between the
+/// Unix Epoch and the KDB Epoch are done automatically.
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
 pub struct Timestamp(i64);
 
 impl Timestamp {
+    /// Creates a timestamp from a count of nanoseconds in the unix epoch
     pub fn from_nanos_unix(n: u64) -> Timestamp {
         Timestamp(n as i64 - K_NANO_OFFSET)
     }
 
+    /// Converts the timestamp to the number of nanoseconds from the unix epoch and returns it
     pub fn to_nanos_unix(&self) -> u64 {
         (self.0 + K_NANO_OFFSET) as u64
     }
 
+    /// Returns the raw timestamp stored as KDB values.
     pub fn as_raw(&self) -> i64 {
         self.0
     }
 
+    /// Creates a timestamp based on a count of nanoseconds from the KDB Epoch.
     pub fn from_raw(n: i64) -> Timestamp {
         Timestamp(n)
     }
@@ -196,6 +212,8 @@ impl From<Timestamp> for i64 {
     }
 }
 
+
+/// Represents a duration in KDB.
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug)]
 pub struct Timespan(i64);

@@ -6,10 +6,17 @@ pub(crate) const K_NANO_OFFSET: i64 = 946_684_800_000_000_000;
 pub(crate) const K_SEC_OFFSET: i64 = K_NANO_OFFSET / 1_000_000_000;
 pub(crate) const K_DAY_OFFSET: i32 = (K_SEC_OFFSET / 86_400) as i32;
 
-/// Represents a number of seconds
+/// Represents the number of seconds since midnight (00:00)
 #[repr(transparent)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Second(i32);
+
+impl Second {
+    pub fn new(seconds_since_midnight: i32) -> Self {
+        Second(seconds_since_midnight)
+    }
+}
+
 impl From<i32> for Second {
     fn from(val: i32) -> Second {
         Second(val)
@@ -35,10 +42,17 @@ impl fmt::Debug for Second {
 }
 
 
-/// Represents a number of minutes.
+/// Represents the number of minutes since midnight (00:00).
 #[repr(transparent)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Minute(i32);
+
+impl Minute {
+    pub fn new(minutes_since_midnight: i32) -> Self {
+        Minute(minutes_since_midnight)
+    }
+}
+
 impl From<i32> for Minute {
     fn from(val: i32) -> Minute {
         Minute(val)
@@ -63,10 +77,17 @@ impl fmt::Debug for Minute {
     }
 }
 
-/// Represents a date in the KDB Epoch
+/// Represents the number of days since 1 Jan 2000.
 #[repr(transparent)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Date(i32);
+
+impl Date {
+    pub fn new(days_since_millenium: i32) -> Self {
+        Date(days_since_millenium)
+    }
+}
+
 impl From<i32> for Date {
     fn from(val: i32) -> Date {
         Date(val)
@@ -94,10 +115,17 @@ impl From<Date> for SystemTime {
     }
 }
 
-/// Represents a Month value in KDB
+/// The number of months since January 2000.
 #[repr(transparent)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Month(i32);
+
+impl Month {
+    pub fn new(months_since_millenium: i32) -> Self {
+        Month(months_since_millenium)
+    }
+}
+
 impl From<i32> for Month {
     fn from(val: i32) -> Month {
         Month(val)
@@ -123,10 +151,17 @@ impl fmt::Debug for Month {
 }
 
 
-//Represents a time in KDB
+/// The number of milliseconds since midnight.
 #[repr(transparent)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Time(i32);
+
+impl Time {
+    pub fn new(millis_since_midnight: i32) -> Self {
+        Time(millis_since_midnight)
+    }
+}
+
 impl From<i32> for Time {
     fn from(val: i32) -> Time {
         Time(val)
@@ -142,9 +177,18 @@ impl From<Time> for i32 {
 
 /// Represents a date and time in KDB. Conversions between the
 /// Unix Epoch and the KDB Epoch are done automatically.
+///
+/// Note that `Timestamp` is the preferred datatype for storing
+/// high precision temporal data.
 #[repr(transparent)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct DateTime(f64);
+
+impl DateTime {
+    pub fn new(dt: f64) -> Self {
+        DateTime(dt)
+    }
+}
 
 impl From<f64> for DateTime {
     fn from(val: f64) -> DateTime {
@@ -158,24 +202,10 @@ impl From<DateTime> for f64 {
     }
 }
 
-impl From<DateTime> for SystemTime {
-    fn from(date: DateTime) -> SystemTime {
-        let secs = date.0 as i64 * 86400 + K_SEC_OFFSET;
-        SystemTime::UNIX_EPOCH + Duration::from_secs(secs as u64)
-    }
-}
-
-impl From<SystemTime> for DateTime {
-    fn from(st: SystemTime) -> DateTime {
-        let dur = st.duration_since(SystemTime::UNIX_EPOCH).unwrap();
-        DateTime((dur.as_secs_f64() / 86400.0) - K_DAY_OFFSET as f64)
-    }
-}
-
 /// Represents a timestamp in KDB. Conversions between the
 /// Unix Epoch and the KDB Epoch are done automatically.
 #[repr(transparent)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Timestamp(i64);
 
 impl Timestamp {
@@ -194,9 +224,22 @@ impl Timestamp {
         self.0
     }
 
-    /// Creates a timestamp based on a count of nanoseconds from the KDB Epoch.
-    pub fn from_raw(n: i64) -> Timestamp {
-        Timestamp(n)
+    /// Creates a timestamp based on a count of nanoseconds since 1 Jan 2000.
+    pub fn from_raw(nanos_since_millenium: i64) -> Timestamp {
+        Timestamp(nanos_since_millenium)
+    }
+}
+
+impl From<Timestamp> for SystemTime {
+    fn from(date: Timestamp) -> SystemTime {
+        SystemTime::UNIX_EPOCH + Duration::from_nanos(date.to_nanos_unix())
+    }
+}
+
+impl From<SystemTime> for Timestamp {
+    fn from(st: SystemTime) -> Timestamp {
+        let dur = st.duration_since(SystemTime::UNIX_EPOCH).unwrap();
+        Timestamp::from_nanos_unix(dur.as_nanos() as u64)
     }
 }
 
@@ -213,10 +256,16 @@ impl From<Timestamp> for i64 {
 }
 
 
-/// Represents a duration in KDB.
+/// Represents the number of nanoseconds since midnight
 #[repr(transparent)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Timespan(i64);
+
+impl Timespan {
+    pub fn new(nanos_since_midnight: i64) -> Self {
+        Timespan(nanos_since_midnight)
+    }
+}
 
 impl From<i64> for Timespan {
     fn from(val: i64) -> Timespan {

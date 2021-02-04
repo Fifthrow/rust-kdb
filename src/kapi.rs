@@ -1,7 +1,9 @@
 //! Provides ffi definitions for the KDB C API.
 
+use crate::date_time_types::{Minute, Month, Second};
 use crate::guid::Guid;
 use crate::k::{F, I, J, K, S, V};
+use crate::k_type::{MINUTE_ATOM, MONTH_ATOM, SECOND_ATOM};
 
 pub type KCallback = extern "C" fn(arg1: I) -> *const K;
 
@@ -14,6 +16,24 @@ pub(crate) unsafe fn tst(nanos: i64) -> *const K {
 
 pub(crate) unsafe fn tsp(nanos: i64) -> *const K {
     ktj(K_TYPE_TIMESPAN, nanos)
+}
+
+pub(crate) unsafe fn ksec(sec: Second) -> *mut K {
+    let atom = ka(SECOND_ATOM.into());
+    (*atom).union.sec = sec;
+    atom
+}
+
+pub(crate) unsafe fn kmin(min: Minute) -> *mut K {
+    let atom = ka(MINUTE_ATOM.into());
+    (*atom).union.min = min;
+    atom
+}
+
+pub(crate) unsafe fn kmonth(m: Month) -> *mut K {
+    let atom = ka(MONTH_ATOM.into());
+    (*atom).union.m = m;
+    atom
 }
 
 #[cfg_attr(not(feature = "embedded"), link(name = "kdb"))]

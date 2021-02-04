@@ -1,5 +1,5 @@
 use crate::k::K;
-use crate::k_type::{KTypeCode, TypeCode};
+use crate::k_type::*;
 
 /// Represents a known or unknown (Any) type that can be stored in a list or atom.
 /// This trait is sealed and can't be implemented from other crates.
@@ -26,7 +26,7 @@ pub trait KObject: private::Sealed {
 /// All KValues and the Any type. Used to provide list concatenation functions.
 // This trait is sealed and can't be implemented from other crates.
 pub trait KListable: private::Sealed {
-    type ListItem;//: std::fmt::Debug;
+    type ListItem; //: std::fmt::Debug;
     const LIST_TYPE_CODE: KTypeCode;
     unsafe fn join_to(item: Self::ListItem, k: *mut K) -> *mut K;
 }
@@ -48,14 +48,20 @@ mod k_type_impls {
 
     macro_rules! impl_k_value {
         ($type:ident, Code = $typecode: ident, Ctor = $ctor:ident, Accessor = $accessor:ident) => {
-            impl_k_value!($type, Code = $typecode, Ctor = $ctor, Accessor = $accessor, Joiner = ja);
+            impl_k_value!(
+                $type,
+                Code = $typecode,
+                Ctor = $ctor,
+                Accessor = $accessor,
+                Joiner = ja
+            );
         };
         ($type:ident, Code = $typecode: ident, Ctor = $ctor:ident, Accessor = $accessor: ident, Joiner = $joiner: ident) => {
             impl KValue for $type {
                 const TYPE_CODE: TypeCode = TypeCode::$typecode;
 
                 unsafe fn from_k(k: &K) -> Self {
-                    k.union.$accessor
+                    k.union.$accessor.into()
                 }
 
                 fn into_k(self) -> *const K {
@@ -84,18 +90,24 @@ mod k_type_impls {
 
     impl_k_value! {f32, Code = REAL, Ctor = ke, Accessor = e }
     impl_k_value! {f64, Code = FLOAT, Ctor = kf, Accessor = f }
-    impl_k_value! {bool, Code = BOOLEAN, Ctor = kg, Accessor = bl }
+    impl_k_value! {bool, Code = BOOLEAN, Ctor = kb, Accessor = bl }
 
-    impl_k_value! {Second, Code = SECOND, Ctor = ki, Accessor = sec }
-    impl_k_value! {Minute, Code = MINUTE, Ctor = ki, Accessor = min }
-    impl_k_value! {Month, Code = MONTH, Ctor = ki, Accessor = m }
-    impl_k_value! {Time, Code = TIME, Ctor = ki, Accessor = t }
-    impl_k_value! {Date, Code = DATE, Ctor = ki, Accessor = d }
-    impl_k_value! {DateTime, Code = DATE_TIME, Ctor = kf, Accessor = dt }
+    impl_k_value! {Second, Code = SECOND, Ctor = ksec, Accessor = sec }
+    impl_k_value! {Minute, Code = MINUTE, Ctor = kmin, Accessor = min }
+    impl_k_value! {Month, Code = MONTH, Ctor = kmonth, Accessor = m }
+    impl_k_value! {Time, Code = TIME, Ctor = kt, Accessor = t }
+    impl_k_value! {Date, Code = DATE, Ctor = kd, Accessor = d }
+    impl_k_value! {DateTime, Code = DATE_TIME, Ctor = kz, Accessor = dt }
     impl_k_value! {Symbol, Code = SYMBOL, Ctor = ks, Accessor = sym, Joiner = js }
     impl_k_value! {Guid, Code = GUID, Ctor = ku, Accessor = u }
     impl_k_value! {Timestamp, Code = TIMESTAMP, Ctor = tst, Accessor = tst }
     impl_k_value! {Timespan, Code = TIMESPAN, Ctor = tsp, Accessor = ts }
+
+    #[cfg(feature = "uuid")]
+    use uuid::Uuid;
+
+    #[cfg(feature = "uuid")]
+    impl_k_value! {Uuid, Code = GUID, Ctor = ku, Accessor = u }
 
     impl<T: KValue> KType for T {}
 

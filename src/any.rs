@@ -120,33 +120,6 @@ impl<T: KValue> From<T> for KBox<Any> {
     }
 }
 
-// macro implementations for conversion of types
-// into any types
-macro_rules! impl_into_any {
-    ($ty:ident) => {};
-}
-
-impl_into_any!(u8);
-impl_into_any!(i8);
-impl_into_any!(i16);
-impl_into_any!(i32);
-impl_into_any!(i64);
-
-impl_into_any!(f32);
-impl_into_any!(f64);
-impl_into_any!(bool);
-
-impl_into_any!(Second);
-impl_into_any!(Minute);
-impl_into_any!(Month);
-impl_into_any!(Time);
-impl_into_any!(Date);
-impl_into_any!(DateTime);
-impl_into_any!(Symbol);
-impl_into_any!(Guid);
-impl_into_any!(Timestamp);
-impl_into_any!(Timespan);
-
 impl KObject for Any {
     fn k_ptr(&self) -> *const K {
         &self.k
@@ -166,4 +139,3 @@ impl KListable for Any {
         kapi::jk(&mut k, mem::ManuallyDrop::new(item).k_ptr())
     }
 }
-

@@ -33,10 +33,12 @@ impl<T: KValue> Atom<T> {
 }
 
 impl<T> KObject for Atom<T> {
+    #[inline]
     fn k_ptr(&self) -> *const K {
         &self.k
     }
 
+    #[inline]
     fn k_ptr_mut(&mut self) -> *mut K {
         &mut self.k
     }
@@ -57,6 +59,7 @@ impl<T: KValue + fmt::Display> fmt::Display for Atom<T> {
 }
 
 impl<T: KValue> From<T> for KBox<Atom<T>> {
+    #[inline]
     fn from(val: T) -> KBox<Atom<T>> {
         KBox {
             k: val.into_k() as *mut K as *mut Atom<T>,
@@ -69,6 +72,7 @@ impl<T: KValue> From<T> for KBox<Atom<T>> {
 macro_rules! impl_atom_from {
     ($ty:ident) => {
         impl From<Atom<$ty>> for $ty {
+            #[inline]
             fn from(val: Atom<$ty>) -> $ty {
                 val.value()
             }

@@ -121,10 +121,12 @@ impl<T: KValue> From<T> for KBox<Any> {
 }
 
 impl KObject for Any {
+    #[inline]
     fn k_ptr(&self) -> *const K {
         &self.k
     }
 
+    #[inline]
     fn k_ptr_mut(&mut self) -> *mut K {
         &mut self.k
     }

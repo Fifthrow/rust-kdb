@@ -108,10 +108,12 @@ where
 }
 
 impl KObject for Dictionary {
+    #[inline]
     fn k_ptr(&self) -> *const K {
         &self.k
     }
 
+    #[inline]
     fn k_ptr_mut(&mut self) -> *mut K {
         &mut self.k
     }

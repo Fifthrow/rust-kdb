@@ -79,7 +79,8 @@ impl Connection {
         Connection(0)
     }
 
-    /// Publish a value asynchronously to KDB.
+    /// [non-embedded only] Publish a value asynchronously to KDB.
+    #[cfg(any(not(feature = "embedded"), doc))]
     pub fn publish(
         &self,
         callback: &str,

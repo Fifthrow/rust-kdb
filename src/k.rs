@@ -3,15 +3,15 @@ use crate::k_type::KTypeCode;
 use crate::symbol::Symbol;
 use std::fmt;
 
-pub type S = *const libc::c_char;
-pub type C = libc::c_char;
-pub type G = libc::c_uchar;
-pub type H = libc::c_short;
-pub type I = libc::c_int;
-pub type J = libc::c_longlong;
-pub type E = libc::c_float;
-pub type F = libc::c_double;
-pub type V = libc::c_void;
+pub type S = *const i8;
+pub type C = i8;
+pub type G = u8;
+pub type H = i16;
+pub type I = i32;
+pub type J = i64;
+pub type E = f32;
+pub type F = f64;
+pub type V = std::ffi::c_void;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -71,8 +71,8 @@ pub union KUnion {
 /// are both ABI compatible with this K.
 #[repr(C)]
 pub struct K {
-    pub m: libc::c_char,
-    pub a: libc::c_char,
+    pub m: i8,
+    pub a: i8,
     pub t: KTypeCode,
     pub u: C,
     pub r: I,
@@ -117,26 +117,6 @@ impl std::fmt::Debug for Attr {
         Ok(())
     }
 }
-
-/*impl PartialEq for K {
-    fn eq(&self, other: &K) -> bool {
-        if self.t != other.t {
-            return false;
-        }
-
-        match self.t {
-            //Atoms
-            t if t > -20 && t < 0 => unsafe {
-                libc::memcmp(
-                    &self.union as *const _ as _,
-                    &other.union as *const _ as _,
-                    t.atom_size(),
-                ) == 0
-            },
-            _ => unimplemented!("Comparison for non-atom K objects not implemented"),
-        }
-    }
-}*/
 
 impl fmt::Debug for K {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

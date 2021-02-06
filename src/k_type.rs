@@ -32,7 +32,7 @@ impl TypeCode {
 
 #[repr(transparent)]
 #[derive(Clone, Copy, Eq, PartialEq, PartialOrd)]
-pub struct KTypeCode(libc::c_char);
+pub struct KTypeCode(i8);
 
 impl From<KTypeCode> for i32 {
     fn from(kt: KTypeCode) -> i32 {
@@ -91,20 +91,6 @@ impl fmt::Display for KTypeCode {
 impl fmt::Debug for KTypeCode {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}({})", self, self.0)
-    }
-}
-
-impl KTypeCode {
-    pub fn atom_size(self) -> usize {
-        match KTypeCode(self.0.abs()) {
-            BOOLEAN_LIST | BYTE_LIST | CHAR_LIST => 1,
-            SHORT_LIST => 2,
-            INT_LIST | REAL_LIST | DATE_LIST | MINUTE_LIST | SECOND_LIST | MONTH_LIST | TIME_LIST => 4,
-            LONG_LIST | FLOAT_LIST | DATE_TIME_LIST | TIMESTAMP_LIST | TIMESPAN_LIST => 8,
-            GUID_LIST => 16,
-            SYMBOL_LIST | MIXED_LIST | TABLE | DICT | ERROR => std::mem::size_of::<*const u8>(),
-            _ => panic!("Unknown K type: {}", self.0),
-        }
     }
 }
 

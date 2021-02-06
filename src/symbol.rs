@@ -1,7 +1,6 @@
 use crate::error::ConversionError;
 use crate::kapi;
-use libc::c_void;
-use std::ffi::CStr;
+use std::ffi::{c_void, CStr};
 use std::fmt;
 use thiserror::Error;
 
@@ -34,6 +33,10 @@ impl std::hash::Hash for Symbol {
     }
 }
 
+extern "C" {
+    fn memchr(cx: *const c_void, c: i32, n: usize) -> *mut c_void;
+}
+
 impl Symbol {
     /// Create a new symbol from the specified string. If the string is
     /// too long, or contains an embedded nul character, then it returns an error.
@@ -44,7 +47,7 @@ impl Symbol {
             return Err(SymbolError::StringTooLong(s.len()));
         }
 
-        let first_nul = unsafe { libc::memchr(s.as_ptr() as *const c_void, 0, s.len()) };
+        let first_nul = unsafe { memchr(s.as_ptr() as *const c_void, 0, s.len()) };
         if !first_nul.is_null() {
             return Err(SymbolError::InternalNul(first_nul as usize - s.as_ptr() as usize));
         }

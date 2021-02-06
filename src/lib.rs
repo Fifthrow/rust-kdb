@@ -104,7 +104,6 @@ mod connection;
 mod date_time_types;
 mod dictionary;
 mod error;
-mod guid;
 mod k;
 mod k_error;
 mod k_type;
@@ -120,8 +119,9 @@ pub use connection::Connection;
 pub use date_time_types::*;
 pub use dictionary::Dictionary;
 pub use error::{ConnectionError, ConversionError, Error};
-pub use guid::Guid;
 pub use k_error::KError;
 pub use kbox::KBox;
 pub use list::List;
 pub use symbol::{symbol, Symbol};
+
+pub use array_iterator;

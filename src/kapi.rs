@@ -1,7 +1,6 @@
 //! Provides ffi definitions for the KDB C API.
 
 use crate::date_time_types::{Minute, Month, Second};
-use crate::guid::Guid;
 use crate::k::{F, I, J, K, S, V};
 use crate::k_type::{MINUTE_ATOM, MONTH_ATOM, SECOND_ATOM};
 
@@ -71,7 +70,9 @@ extern "C" {
     pub fn ktd(keyed_table: *const K) -> *const K;
     pub fn ktj(begin: I, end: J) -> *const K;
     pub fn ktn(k_type: I, len: J) -> *mut K;
-    pub fn ku(guid: Guid) -> *const K;
+
+    #[cfg(feature = "uuid")]
+    pub fn ku(guid: uuid::Uuid) -> *const K;
     pub fn kz(date_time: F) -> *const K;
 
     pub fn m9() -> V;

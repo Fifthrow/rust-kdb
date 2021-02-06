@@ -40,11 +40,12 @@ pub(crate) mod private {
 mod k_type_impls {
     use super::*;
     use crate::date_time_types::*;
-    use crate::guid::Guid;
     use crate::k_error::KError;
     use crate::kapi;
     use crate::symbol::Symbol;
     use crate::{any::Any, dictionary::Dictionary};
+    #[cfg(feature = "uuid")]
+    use uuid::Uuid;
 
     macro_rules! impl_k_value {
         ($type:ident, Code = $typecode: ident, Ctor = $ctor:ident, Accessor = $accessor:ident) => {
@@ -99,15 +100,10 @@ mod k_type_impls {
     impl_k_value! {Date, Code = DATE, Ctor = kd, Accessor = d }
     impl_k_value! {DateTime, Code = DATE_TIME, Ctor = kz, Accessor = dt }
     impl_k_value! {Symbol, Code = SYMBOL, Ctor = ks, Accessor = sym, Joiner = js }
-    impl_k_value! {Guid, Code = GUID, Ctor = ku, Accessor = u }
-    impl_k_value! {Timestamp, Code = TIMESTAMP, Ctor = tst, Accessor = tst }
-    impl_k_value! {Timespan, Code = TIMESPAN, Ctor = tsp, Accessor = ts }
-
-    #[cfg(feature = "uuid")]
-    use uuid::Uuid;
-
     #[cfg(feature = "uuid")]
     impl_k_value! {Uuid, Code = GUID, Ctor = ku, Accessor = u }
+    impl_k_value! {Timestamp, Code = TIMESTAMP, Ctor = tst, Accessor = tst }
+    impl_k_value! {Timespan, Code = TIMESPAN, Ctor = tsp, Accessor = ts }
 
     impl<T: KValue> KType for T {}
 

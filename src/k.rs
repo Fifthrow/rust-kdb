@@ -1,5 +1,4 @@
 use crate::date_time_types::*;
-use crate::guid::Guid;
 use crate::k_type::KTypeCode;
 use crate::symbol::Symbol;
 use std::fmt;
@@ -21,14 +20,16 @@ pub struct List {
     pub g0: *mut G,
 }
 
+#[cfg(feature = "uuid")]
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct GuidWithLen {
     pub n: J,
-    pub u: Guid,
+    pub u: uuid::Uuid,
 }
 
-impl From<GuidWithLen> for Guid {
+#[cfg(feature = "uuid")]
+impl From<GuidWithLen> for uuid::Uuid {
     fn from(g: GuidWithLen) -> Self {
         g.u
     }
@@ -44,6 +45,7 @@ pub union KUnion {
     pub e: E,
     pub f: F,
     pub s: S,
+    #[cfg(feature = "uuid")]
     pub u: GuidWithLen,
     pub k0: *mut K,
     pub list: List,

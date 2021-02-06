@@ -14,9 +14,10 @@ repository = "https://github.com/Fifthrow/rust-kdb"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libc = "0.2"
-uuid = { version = "0.8", optional = true }
+uuid = { version = "0.8.2", optional = true }
 thiserror="1"
+array_iterator="1.3"
 
 [features]
+default = ["uuid"]
 embedded = []

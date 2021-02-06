@@ -1,5 +1,4 @@
 use crate::date_time_types::*;
-use crate::guid::Guid;
 use crate::k::K;
 use crate::kbox::KBox;
 use crate::symbol::Symbol;
@@ -97,7 +96,12 @@ impl_atom_from!(Timestamp);
 impl_atom_from!(Timespan);
 
 impl_atom_from!(Symbol);
-impl_atom_from!(Guid);
+
+#[cfg(feature = "uuid")]
+use uuid::Uuid;
+
+#[cfg(feature = "uuid")]
+impl_atom_from!(Uuid);
 
 impl<T: KValue> KBox<Atom<T>> {
     /// Creates a new atom with the specified value.
@@ -109,6 +113,8 @@ impl<T: KValue> KBox<Atom<T>> {
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::clippy::float_cmp)]
+
     use super::*;
     use crate::any::Any;
     use crate::symbol::symbol;
@@ -134,7 +140,11 @@ mod tests {
         assert_eq!(KBox::new_atom(Timespan::new(12)).value(), Timespan::new(12));
 
         assert_eq!(KBox::new_atom(symbol("Foo")).value(), symbol("Foo"));
-        assert_eq!(KBox::new_atom(Guid::from([12u8; 16])).value(), Guid::from([12u8; 16]));
+        #[cfg(feature = "uuid")]
+        assert_eq!(
+            KBox::new_atom(uuid::Uuid::from_bytes([12u8; 16])).value(),
+            Uuid::from_bytes([12u8; 16])
+        );
     }
 
     #[test]
@@ -237,11 +247,12 @@ mod tests {
                 .value(),
             symbol("Foo")
         );
+        #[cfg(feature = "uuid")]
         assert_eq!(
-            KBox::<Atom<Guid>>::try_from(KBox::<Any>::from(KBox::new_atom(Guid::from([12u8; 16]))))
+            KBox::<Atom<uuid::Uuid>>::try_from(KBox::<Any>::from(KBox::new_atom(uuid::Uuid::from_bytes([12u8; 16]))))
                 .unwrap()
                 .value(),
-            Guid::from([12u8; 16])
+            uuid::Uuid::from_bytes([12u8; 16])
         );
     }
 }

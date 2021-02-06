@@ -8,6 +8,7 @@ use std::{fmt, ops::DerefMut};
 /// KDB equivalent of a Rust Box, a zero overhead wrapper
 /// around a K pointer. It will call `r0` to decrement the reference
 /// count when it is dropped.
+#[repr(transparent)]
 pub struct KBox<T: KObject> {
     pub(crate) k: *mut T,
 }

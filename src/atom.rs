@@ -126,7 +126,7 @@ mod tests {
 
         assert_eq!(KBox::new_atom(Second::new(5)).value(), Second::new(5));
         assert_eq!(KBox::new_atom(Minute::new(6)).value(), Minute::new(6));
-        assert_eq!(KBox::new_atom(Date::new(7)).value(), Date::new(7));
+        assert_eq!(KBox::new_atom(Date::new(2020, 2, 6)).value(), Date::new(2020, 2, 6));
         assert_eq!(KBox::new_atom(Month::new(8)).value(), Month::new(8));
         assert_eq!(KBox::new_atom(Time::new(9)).value(), Time::new(9));
         assert_eq!(KBox::new_atom(DateTime::new(10.0)).value(), DateTime::new(10.0));
@@ -195,10 +195,10 @@ mod tests {
             Minute::new(6)
         );
         assert_eq!(
-            KBox::<Atom<Date>>::try_from(KBox::<Any>::from(KBox::new_atom(Date::new(7))))
+            KBox::<Atom<Date>>::try_from(KBox::<Any>::from(KBox::new_atom(Date::new(2020, 2, 6))))
                 .unwrap()
                 .value(),
-            Date::new(7)
+            Date::new(2020, 2, 6)
         );
         assert_eq!(
             KBox::<Atom<Month>>::try_from(KBox::<Any>::from(KBox::new_atom(Month::new(8))))

@@ -1,3 +1,4 @@
+use crate::kapi;
 use std::convert::TryFrom;
 use std::fmt;
 use std::time::{Duration, SystemTime};
@@ -41,7 +42,6 @@ impl fmt::Debug for Second {
     }
 }
 
-
 /// Represents the number of minutes since midnight (00:00).
 #[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -83,8 +83,8 @@ impl fmt::Debug for Minute {
 pub struct Date(i32);
 
 impl Date {
-    pub fn new(days_since_millenium: i32) -> Self {
-        Date(days_since_millenium)
+    pub fn new(year: i32, month: i32, day: i32) -> Self {
+        Date(unsafe { kapi::ymd(year, month, day) })
     }
 }
 
@@ -150,7 +150,6 @@ impl fmt::Debug for Month {
     }
 }
 
-
 /// The number of milliseconds since midnight.
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -173,7 +172,6 @@ impl From<Time> for i32 {
         val.0
     }
 }
-
 
 /// Represents a date and time in KDB. Conversions between the
 /// Unix Epoch and the KDB Epoch are done automatically.
@@ -254,7 +252,6 @@ impl From<Timestamp> for i64 {
         val.0
     }
 }
-
 
 /// Represents the number of nanoseconds since midnight
 #[repr(transparent)]

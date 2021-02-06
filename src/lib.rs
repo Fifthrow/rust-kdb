@@ -12,20 +12,21 @@
 //!
 //! 1. It's really fast. The abstractions around the KDB types have zero overhead
 //! so while it feels like you are using rust types with all the trimmings, it is as fast as calling
-//! the raw C API directly. 
-//! 2. It's safe! Using the C API is full of pitfalls that cause undefined behaviour. 
+//! the raw C API directly.
+//! 2. It's safe! Using the C API is full of pitfalls that cause undefined behaviour.
 //! The abstractions in rust-kdb manage these for you, so that you don't need to worry about
 //! freeing your KDB objects or weird behaviour.
 //! 3. It's just like using other rust data types. We've worked hard to make Lists work like
 //! Rust vectors, and to add similar convenience functions to dictionaries.
 //!
 //! # Why you might not like it
-//! 
+//!
 //! 1. Type conversions are common. It's not unusual to see rust-kdb code littered with `.try_into().unwrap()`
 //!    Especially when working with mixed lists. This is a consequence of retrofitting the kdb type system into
 //!    Rust. These type conversions are cheap (from/into are free, try_from/try_into are a single check of the KDB type code)
 //!    But they do dirty the code somewhat.
-//! 2. It's incomplete. It currently lacks support for tables and not all functions have been included.
+//! 2. It's incomplete. It currently lacks support for tables and not all functions have been included. The plan is to include these features
+//!    in time.
 //!
 //! # Creating KDB types
 //!
@@ -59,7 +60,7 @@
 //! The `Any` type can be used in place of any valid KDB value (atom or list).
 //! You can't do much with it, except try to convert it to a different type, using
 //! the `TryFrom`/`TryInto` traits.
-//! 
+//!
 //! ```
 //! use kdb::*;
 //! use std::convert::{TryFrom, TryInto};
@@ -95,7 +96,7 @@
 //! 1. Note that KDB parameters in extern "C" functions are references to KDB types, rather than a KBox. In KDB, the caller owns the parameters.
 //!    Using a KBox here will likely cause a segfault.
 //! 2. The return type is always either a KBox<T> or Option<KBox<T>>. This is equivalent to returning a K pointer. Always return an owned type.
-//! 3. You can use typed atoms for parameters, not just Any. Bear in mind that this is unsafe as it is possible for q code to call the function 
+//! 3. You can use typed atoms for parameters, not just Any. Bear in mind that this is unsafe as it is possible for q code to call the function
 //! with a type other than that one. Any is always safest.
 
 mod any;

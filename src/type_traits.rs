@@ -18,7 +18,9 @@ pub trait KValue: KType {
 /// Indicates a type that wraps a `K` object. This trait is sealed and can't be implemented
 /// from other crates.
 pub trait KObject: private::Sealed {
+    /// Returns a pointer to the underlying K type
     fn k_ptr(&self) -> *const K;
+    /// Returns a mutable pointer to the underlying K type
     fn k_ptr_mut(&mut self) -> *mut K;
 }
 

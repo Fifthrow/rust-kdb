@@ -89,7 +89,7 @@ impl fmt::Display for KTypeCode {
 }
 
 impl KTypeCode {
-    pub fn atom_size(self) -> usize {
+    pub(crate) fn atom_size(self) -> usize {
         match KTypeCode(self.0.abs()) {
             BOOLEAN_LIST | BYTE_LIST | CHAR_LIST => 1,
             SHORT_LIST => 2,

@@ -99,6 +99,8 @@
 //! 3. You can use typed atoms for parameters, not just Any. Bear in mind that this is unsafe as it is possible for q code to call the function
 //! with a type other than that one. Any is always safest.
 
+#![warn(missing_docs)] // warn if there are missing docs
+
 mod any;
 mod atom;
 mod connection;

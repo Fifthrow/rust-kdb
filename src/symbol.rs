@@ -4,10 +4,13 @@ use std::ffi::{c_void, CStr};
 use std::fmt;
 use thiserror::Error;
 
+/// Error type for string to symbol conversions
 #[derive(Debug, Error)]
 pub enum SymbolError {
+    /// An embedded NUL character was found in the string. The string would be truncated at this point if it were passed to KDB
     #[error("Embedded NUL character found at index {0}")]
     InternalNul(usize),
+    /// The string is too long to convert to a symbol. It can be a maximum of 2GB.
     #[error("String too long ({0} chars)")]
     StringTooLong(usize),
 }
@@ -17,7 +20,7 @@ pub enum SymbolError {
 /// Can be converted to/from strings
 #[repr(transparent)]
 #[derive(Clone, Copy)]
-pub struct Symbol(pub(crate) *const i8);
+pub struct Symbol(*const i8);
 
 impl PartialEq for Symbol {
     fn eq(&self, other: &Symbol) -> bool {

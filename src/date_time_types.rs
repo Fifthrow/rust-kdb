@@ -13,6 +13,7 @@ pub(crate) const K_DAY_OFFSET: i32 = (K_SEC_OFFSET / 86_400) as i32;
 pub struct Second(i32);
 
 impl Second {
+    /// Creates a new Second from the specified number.
     pub fn new(seconds_since_midnight: i32) -> Self {
         Second(seconds_since_midnight)
     }
@@ -48,6 +49,7 @@ impl fmt::Debug for Second {
 pub struct Minute(i32);
 
 impl Minute {
+    /// Creates a new Minute from the specified number.
     pub fn new(minutes_since_midnight: i32) -> Self {
         Minute(minutes_since_midnight)
     }
@@ -83,6 +85,7 @@ impl fmt::Debug for Minute {
 pub struct Date(i32);
 
 impl Date {
+    /// Creates a new date.
     pub fn new(year: i32, month: i32, day: i32) -> Self {
         Date(unsafe { kapi::ymd(year, month, day) })
     }
@@ -121,6 +124,7 @@ impl From<Date> for SystemTime {
 pub struct Month(i32);
 
 impl Month {
+    /// Creates a new month from the specified number of months.
     pub fn new(months_since_millenium: i32) -> Self {
         Month(months_since_millenium)
     }
@@ -156,6 +160,7 @@ impl fmt::Debug for Month {
 pub struct Time(i32);
 
 impl Time {
+    /// Creates a Time from the specified number of milliseconds.
     pub fn new(millis_since_midnight: i32) -> Self {
         Time(millis_since_midnight)
     }
@@ -183,6 +188,7 @@ impl From<Time> for i32 {
 pub struct DateTime(f64);
 
 impl DateTime {
+    /// Creates a DateTime with the supplied value.
     pub fn new(dt: f64) -> Self {
         DateTime(dt)
     }
@@ -207,12 +213,12 @@ impl From<DateTime> for f64 {
 pub struct Timestamp(i64);
 
 impl Timestamp {
-    /// Creates a timestamp from a count of nanoseconds in the unix epoch
+    /// Creates a timestamp from a count of nanoseconds in the unix epoch.
     pub fn from_nanos_unix(n: u64) -> Timestamp {
         Timestamp(n as i64 - K_NANO_OFFSET)
     }
 
-    /// Converts the timestamp to the number of nanoseconds from the unix epoch and returns it
+    /// Converts the timestamp to the number of nanoseconds from the unix epoch and returns it.
     pub fn to_nanos_unix(&self) -> u64 {
         (self.0 + K_NANO_OFFSET) as u64
     }
@@ -253,12 +259,13 @@ impl From<Timestamp> for i64 {
     }
 }
 
-/// Represents the number of nanoseconds since midnight
+/// Represents the number of nanoseconds since midnight.
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Timespan(i64);
 
 impl Timespan {
+    /// Creates a Timespan from the specified number of nanoseconds.
     pub fn new(nanos_since_midnight: i64) -> Self {
         Timespan(nanos_since_midnight)
     }

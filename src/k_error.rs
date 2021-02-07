@@ -22,6 +22,7 @@ impl KObject for KError {
 }
 
 impl KBox<KError> {
+    /// Create a new KDB error from the specified string.
     pub fn new_error(msg: &str) -> Self {
         let mut err = KBox::new_atom(symbol(msg)).into_raw() as *mut K;
         unsafe {

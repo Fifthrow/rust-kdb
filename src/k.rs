@@ -1,6 +1,7 @@
 use crate::date_time_types::*;
 use crate::k_type::KTypeCode;
 use crate::symbol::Symbol;
+use std::ffi::c_void;
 use std::fmt;
 
 pub type S = *const i8;
@@ -17,7 +18,7 @@ pub type V = std::ffi::c_void;
 #[derive(Clone, Copy)]
 pub struct List {
     pub n: J,
-    pub g0: *mut G,
+    pub g0: [u8; 1],
 }
 
 #[cfg(feature = "uuid")]
@@ -128,5 +129,29 @@ impl fmt::Debug for K {
             r = self.r,
         )?;
         Ok(())
+    }
+}
+
+extern "C" {
+    fn memcmp(cx: *const c_void, ct: *const c_void, n: usize) -> i32;
+}
+
+impl PartialEq for K {
+    fn eq(&self, other: &K) -> bool {
+        if self.t != other.t {
+            return false;
+        }
+
+        match i32::from(self.t) {
+            //Atoms
+            t if t > -20 && t < 0 => unsafe {
+                memcmp(
+                    &self.union as *const _ as _,
+                    &other.union as *const _ as _,
+                    self.t.atom_size(),
+                ) == 0
+            },
+            _ => unimplemented!("Comparison for non-atom K objects not implemented"),
+        }
     }
 }

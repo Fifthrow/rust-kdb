@@ -15,6 +15,7 @@ use std::mem;
 /// It is ABI compatible with a K object, so it can be safely used as a parameter or return type for a function.
 /// See the chapter on embedded functions for more information.
 #[repr(transparent)]
+#[derive(PartialEq)]
 pub struct Any {
     k: K,
 }

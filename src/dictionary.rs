@@ -4,6 +4,7 @@ use crate::{any::Any, k::K};
 use crate::{k_type::MIXED_LIST, kapi, type_traits::KObject};
 use std::{mem, ops::Index};
 
+/// A key value based dictionary.
 #[repr(transparent)]
 pub struct Dictionary {
     k: K,
@@ -12,7 +13,8 @@ pub struct Dictionary {
 impl Dictionary {
     fn raw_key_value_lists(&self) -> &[KBox<List<Any>>; 2] {
         unsafe {
-            ((&self.k.union.list.g0) as *const *mut u8 as *const [KBox<List<Any>>; 2])
+            assert_eq!(self.k.union.list.n, 2);
+            ((&self.k.union.list.g0) as *const _ as *const [KBox<List<Any>>; 2])
                 .as_ref()
                 .unwrap()
         }
@@ -20,7 +22,7 @@ impl Dictionary {
 
     fn raw_key_value_lists_mut(&mut self) -> &mut [KBox<List<Any>>; 2] {
         unsafe {
-            ((&self.k.union.list.g0) as *const *mut u8 as *mut [KBox<List<Any>>; 2])
+            ((&self.k.union.list.g0) as *const _ as *mut [KBox<List<Any>>; 2])
                 .as_mut()
                 .unwrap()
         }
@@ -70,13 +72,11 @@ impl Dictionary {
     /// No checks are done on uniqueness so duplicates are possible.
     #[inline]
     pub fn insert(&mut self, key: impl Into<KBox<Any>>, value: impl Into<KBox<Any>>) {
-        let key = key.into();
-        let value = value.into();
-        self.key_list_mut().push(key);
-        self.value_list_mut().push(value);
+        self.key_list_mut().push(key.into());
+        self.value_list_mut().push(value.into());
     }
 
-    /// Gets a value by key. Note that KDB dictionaries are unordered and hence is an O(n) operation.
+    /// Gets a value by key. Note that KDB dictionaries are treated as unordered and hence this is an O(n) operation.
     #[inline]
     pub fn get<T: Into<KBox<Any>>>(&self, key: T) -> Option<&KBox<Any>> {
         let key = key.into();
@@ -84,7 +84,7 @@ impl Dictionary {
             .keys()
             .iter()
             .enumerate()
-            .find(|(_, k2)| k2.k == key.k)
+            .find(|(_, k2)| unsafe { *k2.k == *key.k })
             .map(|(i, _)| i)?;
         self.values().get(index)
     }
@@ -127,5 +127,30 @@ impl KBox<Dictionary> {
             let values = kapi::ktn(MIXED_LIST.into(), 0) as *mut K;
             mem::transmute(kapi::xD(keys, values))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::symbol;
+
+    use super::*;
+
+    #[test]
+    fn insert_appends_items_to_dictionary() {
+        let mut dict = KBox::new_dict();
+        dict.insert(symbol("Hello"), symbol("World"));
+
+        assert_eq!(dict.len(), 1);
+    }
+
+    #[test]
+    fn get_retrieves_items_by_key() {
+        let mut dict = KBox::new_dict();
+        dict.insert(symbol("Hello"), symbol("World"));
+
+        let val = dict.get(symbol("Hello")).unwrap();
+
+        assert_eq!(*val.as_ref(), *KBox::<Any>::from(symbol("World")).as_ref());
     }
 }

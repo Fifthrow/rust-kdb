@@ -111,6 +111,7 @@ mod k_type;
 pub mod kapi;
 mod kbox;
 mod list;
+mod serialization;
 mod symbol;
 mod type_traits;
 
@@ -123,6 +124,7 @@ pub use error::{ConnectionError, ConversionError, Error};
 pub use k_error::KError;
 pub use kbox::KBox;
 pub use list::List;
+pub use serialization::*;
 pub use symbol::{symbol, Symbol};
 
 pub use array_iterator;

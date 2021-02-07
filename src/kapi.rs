@@ -37,12 +37,12 @@ pub(crate) unsafe fn kmonth(m: Month) -> *mut K {
 
 #[cfg_attr(not(feature = "embedded"), link(name = "kdb"))]
 extern "C" {
-    pub fn b9(mode: I, x: *const K) -> *const K;
+    pub fn b9(mode: I, x: *const K) -> *mut K;
 
     pub fn d9(x: *const K) -> *const K;
     pub fn dj(date: I) -> I;
     pub fn dl(f: *mut V, n: I) -> *const K;
-    pub fn dot(x: K, y: K) -> *const K;
+    pub fn dot(x: *const K, y: *const K) -> *mut K;
 
     pub fn ee(x: *mut K) -> *mut K;
 
@@ -72,7 +72,7 @@ extern "C" {
     pub fn ktn(k_type: I, len: J) -> *mut K;
 
     #[cfg(feature = "uuid")]
-    pub fn ku(guid: uuid::Uuid) -> *const K;
+    pub fn ku(guid: uuid::Uuid) -> *mut K;
     pub fn kz(date_time: F) -> *const K;
 
     pub fn m9() -> V;

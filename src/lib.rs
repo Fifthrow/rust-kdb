@@ -115,6 +115,7 @@ mod kbox;
 mod list;
 mod serialization;
 mod symbol;
+mod table;
 mod type_traits;
 
 pub use any::Any;
@@ -128,6 +129,7 @@ pub use kbox::KBox;
 pub use list::List;
 pub use serialization::*;
 pub use symbol::{symbol, Symbol};
+pub use table::Table;
 
 pub use array_iterator;
 #[cfg(feature = "uuid")]

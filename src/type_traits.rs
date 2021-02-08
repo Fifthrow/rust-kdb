@@ -1,12 +1,8 @@
 use crate::k::K;
 use crate::k_type::*;
 
-/// Represents a known or unknown (Any) type that can be stored in a list or atom.
-/// This trait is sealed and can't be implemented from other crates.
-pub trait KType: private::Sealed {}
-
 /// Represents a known type that can be stored in and retrieved from a list or an atom.
-pub trait KValue: KType {
+pub trait KValue: private::Sealed {
     ///TYPE_CODE is *not* the K 't' field. it's a value than can be
     /// Converted into a list or an atom code.
     const TYPE_CODE: TypeCode;
@@ -42,11 +38,12 @@ pub(crate) mod private {
 
 mod k_type_impls {
     use super::*;
-    use crate::date_time_types::*;
     use crate::k_error::KError;
     use crate::kapi;
     use crate::symbol::Symbol;
     use crate::{any::Any, dictionary::Dictionary};
+    use crate::{date_time_types::*, table::Table};
+
     #[cfg(feature = "uuid")]
     use uuid::Uuid;
 
@@ -112,15 +109,11 @@ mod k_type_impls {
     impl_k_value! {Timestamp, Code = TIMESTAMP, Ctor = tst, Accessor = tst }
     impl_k_value! {Timespan, Code = TIMESPAN, Ctor = tsp, Accessor = ts }
 
-    impl<T: KValue> KType for T {}
-
-    impl KType for Any {}
-
-    impl KType for Dictionary {}
-
     impl private::Sealed for Any {}
 
     impl private::Sealed for Dictionary {}
+
+    impl private::Sealed for Table {}
 
     impl private::Sealed for KError {}
 }

@@ -1,11 +1,11 @@
-use crate::k::K;
-use crate::kapi;
 use crate::kbox::KBox;
 use crate::list::List;
 use crate::type_traits::*;
 use crate::{atom::Atom, k_type::DICT};
 use crate::{error::ConversionError, Dictionary};
+use crate::{k::K, Table};
 use crate::{k_type::KTypeCode, k_type::MIXED_LIST};
+use crate::{k_type::TABLE, kapi};
 use std::convert::TryFrom;
 use std::fmt;
 use std::mem;
@@ -39,6 +39,12 @@ impl<T: KListable> AsRef<Any> for List<T> {
 }
 
 impl AsRef<Any> for Dictionary {
+    fn as_ref(&self) -> &Any {
+        unsafe { &*(self as *const _ as *const _) }
+    }
+}
+
+impl AsRef<Any> for Table {
     fn as_ref(&self) -> &Any {
         unsafe { &*(self as *const _ as *const _) }
     }
@@ -116,6 +122,21 @@ where
     }
 }
 
+impl TryFrom<&Any> for &Dictionary {
+    type Error = ConversionError;
+
+    fn try_from(any: &Any) -> Result<Self, Self::Error> {
+        if any.k.t == DICT {
+            Ok(unsafe { &*(any as *const _ as *const _) })
+        } else {
+            Err(ConversionError::InvalidKCast {
+                from: any.k.t,
+                to: DICT,
+            })
+        }
+    }
+}
+
 impl TryFrom<KBox<Any>> for KBox<Dictionary> {
     type Error = ConversionError;
 
@@ -133,6 +154,42 @@ impl TryFrom<KBox<Any>> for KBox<Dictionary> {
 
 impl From<KBox<Dictionary>> for KBox<Any> {
     fn from(value: KBox<Dictionary>) -> Self {
+        unsafe { mem::transmute(value) }
+    }
+}
+
+impl TryFrom<&Any> for &Table {
+    type Error = ConversionError;
+
+    fn try_from(any: &Any) -> Result<Self, Self::Error> {
+        if any.k.t == TABLE {
+            Ok(unsafe { &*(any as *const _ as *const _) })
+        } else {
+            Err(ConversionError::InvalidKCast {
+                from: any.k.t,
+                to: TABLE,
+            })
+        }
+    }
+}
+
+impl TryFrom<KBox<Any>> for KBox<Table> {
+    type Error = ConversionError;
+
+    fn try_from(any: KBox<Any>) -> Result<Self, Self::Error> {
+        if any.as_ref().k.t == TABLE {
+            Ok(unsafe { mem::transmute(any) })
+        } else {
+            Err(ConversionError::InvalidKCast {
+                from: any.as_ref().k.t,
+                to: TABLE,
+            })
+        }
+    }
+}
+
+impl From<KBox<Table>> for KBox<Any> {
+    fn from(value: KBox<Table>) -> Self {
         unsafe { mem::transmute(value) }
     }
 }

@@ -137,7 +137,7 @@ impl From<KBox<Dictionary>> for KBox<Any> {
     }
 }
 
-impl<T: KValue> From<KBox<List<T>>> for KBox<Any> {
+impl<T: KListable> From<KBox<List<T>>> for KBox<Any> {
     fn from(value: KBox<List<T>>) -> Self {
         unsafe { mem::transmute(value) }
     }

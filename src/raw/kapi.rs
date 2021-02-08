@@ -26,6 +26,8 @@ extern "C" {
     pub fn dl(f: *mut V, n: I) -> *const K;
     pub fn dot(x: K, y: K) -> *const K;
 
+    pub fn ee(x: *const K) -> *const K;
+
     pub fn ja(list: *mut *mut K, atom: *const V) -> *const K;
     pub fn js(list: *mut *mut K, symbol: S) -> *const K;
     pub fn jk(list: *mut *mut K, k: *const K) -> *const K;

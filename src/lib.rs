@@ -30,6 +30,8 @@ pub use mixed_list::{mixed_list_from_raw, KMixedList};
 pub use raw::types::*;
 pub use table::KTable;
 pub use unowned::Unowned;
+pub use unowned::{b9_serialize, d9_deserialize};
+
 pub mod c_api {
     pub use crate::raw::kapi::*;
 }

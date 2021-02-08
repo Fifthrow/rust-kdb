@@ -36,6 +36,13 @@ impl From<GuidWithLen> for uuid::Uuid {
     }
 }
 
+#[cfg(feature = "uuid")]
+impl<'a> From<&'a mut GuidWithLen> for &'a mut uuid::Uuid {
+    fn from(g: &'a mut GuidWithLen) -> Self {
+        &mut g.u
+    }
+}
+
 #[repr(C)]
 pub union KUnion {
     pub c: C,

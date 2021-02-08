@@ -1,11 +1,11 @@
-use crate::k::K;
 use crate::kapi;
 use crate::kbox::KBox;
 use crate::type_traits::*;
-use std::mem;
+use crate::{k::K, ConversionError};
 use std::ops;
 use std::slice;
 use std::{marker::PhantomData, slice::SliceIndex};
+use std::{mem, str};
 
 use std::{
     iter::FromIterator,
@@ -128,6 +128,29 @@ impl<T: KListable> KBox<List<T>> {
         unsafe {
             self.k = T::join_to(item, self.k as *mut K) as *mut List<T>;
         }
+    }
+}
+
+impl List<i8> {
+    /// Attempts to convert to a valid utf-8 string.
+    /// This will return an error if the string contains invalid utf-8 characters.
+    /// This function does not allocate.
+    pub fn try_as_str(&self) -> Result<&str, ConversionError> {
+        #[allow(clippy::transmute_ptr_to_ptr)]
+        let s: &[u8] = unsafe { mem::transmute(self.as_slice()) };
+        Ok(str::from_utf8(s)?)
+    }
+
+    /// Converts the symbol to a rust str without checking if it is valid.
+    ///
+    /// # Safety
+    ///
+    /// The string must be valid UTF-8.
+    /// It's length must be less than or equal to isize::MAX.
+    pub unsafe fn as_str_unchecked(&self) -> &str {
+        #[allow(clippy::transmute_ptr_to_ptr)]
+        let s: &[u8] = mem::transmute(self.as_slice());
+        str::from_utf8_unchecked(s)
     }
 }
 

@@ -168,7 +168,7 @@ macro_rules! impl_katom {
         impl std::ops::Deref for $type {
             type Target = $atom_type;
             fn deref(&self) -> &Self::Target {
-                unsafe { &(*self.0).union.$accessor }
+                unsafe { (&(*self.0).union.$accessor).into() }
             }
         }
     }

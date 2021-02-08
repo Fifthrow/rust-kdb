@@ -153,6 +153,25 @@ pub(crate) unsafe fn as_slice<'a, T>(k: *const K) -> &'a [T] {
 }
 
 #[repr(C)]
+#[derive(Clone, Copy)]
+pub struct GuidWithLen {
+    pub n: J,
+    pub u: Guid,
+}
+
+impl From<GuidWithLen> for Guid {
+    fn from(g: GuidWithLen) -> Self {
+        g.u
+    }
+}
+
+impl<'a> From<&'a GuidWithLen> for &'a Guid {
+    fn from(g: &'a GuidWithLen) -> Self {
+        &g.u
+    }
+}
+
+#[repr(C)]
 pub union KUnion {
     pub c: C,
     pub g: G,
@@ -162,7 +181,7 @@ pub union KUnion {
     pub e: E,
     pub f: F,
     pub s: S,
-    pub u: Guid,
+    pub u: GuidWithLen,
     pub k0: *mut K,
     pub list: List,
     // custom accessors for the wrapping types - these make the implementation macros easier

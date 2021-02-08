@@ -116,6 +116,8 @@ mod k_type_impls {
 
     impl KType for Any {}
 
+    impl KType for Dictionary {}
+
     impl private::Sealed for Any {}
 
     impl private::Sealed for Dictionary {}

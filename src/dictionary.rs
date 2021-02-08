@@ -58,14 +58,14 @@ impl Dictionary {
 
     /// Gets a slice containing all the keys in this dictionary.
     #[inline]
-    pub fn keys(&self) -> &[KBox<Any>] {
-        &self.key_list()[..]
+    pub fn keys(&self) -> &[Any] {
+        unsafe { mem::transmute(&self.key_list()[..]) }
     }
 
     /// Gets a slice containing all the values in this dictionary.
     #[inline]
-    pub fn values(&self) -> &[KBox<Any>] {
-        &self.value_list()[..]
+    pub fn values(&self) -> &[Any] {
+        unsafe { mem::transmute(&self.value_list()[..]) }
     }
 
     /// Insert a specified key and value at the end of the dictionary.
@@ -78,20 +78,20 @@ impl Dictionary {
 
     /// Gets a value by key. Note that KDB dictionaries are treated as unordered and hence this is an O(n) operation.
     #[inline]
-    pub fn get<T: Into<KBox<Any>>>(&self, key: T) -> Option<&KBox<Any>> {
+    pub fn get<T: Into<KBox<Any>>>(&self, key: T) -> Option<&Any> {
         let key = key.into();
         let index = self
             .keys()
             .iter()
             .enumerate()
-            .find(|(_, k2)| unsafe { *k2.k == *key.k })
+            .find(|(_, k2)| unsafe { **k2 == *key.k })
             .map(|(i, _)| i)?;
         self.values().get(index)
     }
 
     /// An iterator through every value in the KDB object
     #[inline]
-    pub fn iter(&self) -> impl Iterator<Item = (&KBox<Any>, &KBox<Any>)> {
+    pub fn iter(&self) -> impl Iterator<Item = (&Any, &Any)> {
         self.keys().iter().zip(self.values().iter())
     }
 }
@@ -151,6 +151,6 @@ mod tests {
 
         let val = dict.get(symbol("Hello")).unwrap();
 
-        assert_eq!(*val.as_ref(), *KBox::<Any>::from(symbol("World")).as_ref());
+        assert_eq!(*val, *KBox::<Any>::from(symbol("World")).as_ref());
     }
 }

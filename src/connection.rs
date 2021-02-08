@@ -47,15 +47,14 @@ fn from_raw(k: *mut K) -> KBox<Any> {
 pub struct Connection(i32);
 
 impl Connection {
-    /// Connect to a remote instance of KDB.
+    /// [non-embedded only] Connect to a remote instance of KDB.
     #[cfg(not(feature = "embedded"))]
     pub fn connect(
         hostname: &str,
         port: u16,
         credentials: &str,
         timeout: Option<std::time::Duration>,
-    ) -> Result<Self, crate::error::ConnectionError> {
-        use crate::error::ConnectionError;
+    ) -> Result<Self, ConnectionError> {
         let c_hostname = CString::new(hostname).unwrap();
         let c_credentials = CString::new(credentials).unwrap();
 

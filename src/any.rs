@@ -1,10 +1,10 @@
-use crate::atom::Atom;
-use crate::error::ConversionError;
 use crate::k::K;
 use crate::kapi;
 use crate::kbox::KBox;
 use crate::list::List;
 use crate::type_traits::*;
+use crate::{atom::Atom, k_type::DICT};
+use crate::{error::ConversionError, Dictionary};
 use crate::{k_type::KTypeCode, k_type::MIXED_LIST};
 use std::convert::TryFrom;
 use std::fmt;
@@ -27,6 +27,18 @@ impl fmt::Debug for Any {
 }
 
 impl<T: KValue> AsRef<Any> for Atom<T> {
+    fn as_ref(&self) -> &Any {
+        unsafe { &*(self as *const _ as *const _) }
+    }
+}
+
+impl<T: KListable> AsRef<Any> for List<T> {
+    fn as_ref(&self) -> &Any {
+        unsafe { &*(self as *const _ as *const _) }
+    }
+}
+
+impl AsRef<Any> for Dictionary {
     fn as_ref(&self) -> &Any {
         unsafe { &*(self as *const _ as *const _) }
     }
@@ -70,17 +82,17 @@ where
 
 impl<T> TryFrom<&Any> for &List<T>
 where
-    T: KValue,
+    T: KListable,
 {
     type Error = ConversionError;
 
     fn try_from(any: &Any) -> Result<Self, Self::Error> {
-        if any.k.t == T::TYPE_CODE.as_list() {
+        if any.k.t == T::LIST_TYPE_CODE {
             Ok(unsafe { &*(any as *const _ as *const _) })
         } else {
             Err(ConversionError::InvalidKCast {
                 from: any.k.t,
-                to: T::TYPE_CODE.as_list(),
+                to: T::LIST_TYPE_CODE,
             })
         }
     }
@@ -88,19 +100,40 @@ where
 
 impl<T> TryFrom<KBox<Any>> for KBox<List<T>>
 where
-    T: KValue,
+    T: KListable,
 {
     type Error = ConversionError;
 
     fn try_from(any: KBox<Any>) -> Result<Self, Self::Error> {
-        if any.as_ref().k.t == T::TYPE_CODE.as_list() {
+        if any.as_ref().k.t == T::LIST_TYPE_CODE {
             Ok(unsafe { mem::transmute(any) })
         } else {
             Err(ConversionError::InvalidKCast {
                 from: any.as_ref().k.t,
-                to: T::TYPE_CODE.as_list(),
+                to: T::LIST_TYPE_CODE,
             })
         }
+    }
+}
+
+impl TryFrom<KBox<Any>> for KBox<Dictionary> {
+    type Error = ConversionError;
+
+    fn try_from(any: KBox<Any>) -> Result<Self, Self::Error> {
+        if any.as_ref().k.t == DICT {
+            Ok(unsafe { mem::transmute(any) })
+        } else {
+            Err(ConversionError::InvalidKCast {
+                from: any.as_ref().k.t,
+                to: DICT,
+            })
+        }
+    }
+}
+
+impl From<KBox<Dictionary>> for KBox<Any> {
+    fn from(value: KBox<Dictionary>) -> Self {
+        unsafe { mem::transmute(value) }
     }
 }
 
@@ -109,6 +142,7 @@ impl<T: KValue> From<KBox<List<T>>> for KBox<Any> {
         unsafe { mem::transmute(value) }
     }
 }
+
 impl<T: KValue> From<KBox<Atom<T>>> for KBox<Any> {
     fn from(value: KBox<Atom<T>>) -> Self {
         unsafe { mem::transmute(value) }

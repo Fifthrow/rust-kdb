@@ -39,6 +39,12 @@ impl fmt::Display for KError {
     }
 }
 
+impl fmt::Debug for KError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let cs = unsafe { CStr::from_ptr(self.k.union.s) };
+        write!(f, "{}", String::from_utf8_lossy(cs.to_bytes()))
+    }
+}
 impl From<KBox<KError>> for Error {
     fn from(ke: KBox<KError>) -> Self {
         Error::QError(ke.to_string())

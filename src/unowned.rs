@@ -81,3 +81,46 @@ fn b9_serialize_any(mode: SerializationMode, k: &KAny) -> Result<KByteList, KErr
 pub fn d9_deserialize(k: &KByteList) -> Result<KAny, KError> {
     unsafe { ee(kapi::d9(k.as_k_ptr())) }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::convert::TryInto;
+
+    use super::*;
+    use crate::{mixed_list, KMixedList};
+
+    #[test]
+    fn b9_d9_roundtrips() {
+        let bytes = b9_serialize(SerializationMode::InProc, mixed_list![1, 2, 3]).unwrap();
+        let v: KMixedList = d9_deserialize(&bytes).unwrap().try_into().unwrap();
+        assert_eq!(v.len(), 3);
+
+        let bytes = b9_serialize(SerializationMode::Enumerate, mixed_list![1, 2, 3]).unwrap();
+        let v: KMixedList = d9_deserialize(&bytes).unwrap().try_into().unwrap();
+        assert_eq!(v.len(), 3);
+
+        let bytes = b9_serialize(SerializationMode::Unenumerate, mixed_list![1, 2, 3]).unwrap();
+        let v: KMixedList = d9_deserialize(&bytes).unwrap().try_into().unwrap();
+        assert_eq!(v.len(), 3);
+
+        let bytes = b9_serialize(SerializationMode::Compress, mixed_list![1, 2, 3]).unwrap();
+        let v: KMixedList = d9_deserialize(&bytes).unwrap().try_into().unwrap();
+        assert_eq!(v.len(), 3);
+    }
+
+    #[cfg(feature = "remote-test")]
+    #[test]
+    fn b9_d9_roundtrips_remote() {
+        use crate::symbol;
+        let kdb = crate::Connection::connect("127.0.0.1", 4200, "", None).unwrap();
+
+        let bytes = b9_serialize(SerializationMode::Enumerate, mixed_list![1, 2, 3]).unwrap();
+        kdb.eval_2("set", symbol("b9_a"), bytes).unwrap();
+
+        let bytes = b9_serialize(SerializationMode::Unenumerate, mixed_list![1, 2, 3]).unwrap();
+        kdb.eval_2("set", symbol("b9_b"), bytes).unwrap();
+
+        let bytes = b9_serialize(SerializationMode::Compress, mixed_list![1, 2, 3]).unwrap();
+        kdb.eval_2("set", symbol("b9_c"), bytes).unwrap();
+    }
+}

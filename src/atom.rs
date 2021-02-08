@@ -30,6 +30,12 @@ impl<T: KValue> Atom<T> {
     pub fn value(&self) -> T {
         unsafe { T::from_k(&self.k) }
     }
+
+    /// Changes the value stored in th atom.
+    #[inline]
+    pub fn set_value(&mut self, val: T) {
+        unsafe { *T::as_mutable(&mut self.k) = val }
+    }
 }
 
 impl<T> KObject for Atom<T> {
@@ -150,7 +156,155 @@ mod tests {
             Uuid::from_bytes([12u8; 16])
         );
     }
+    #[test]
+    fn set_value_changes_underlying_value() {
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(11i8);
+                a.set_value(12i8);
+                a.value()
+            },
+            12i8
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(12u8);
+                a.set_value(13u8);
+                a.value()
+            },
+            13u8
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(13i16);
+                a.set_value(14i16);
+                a.value()
+            },
+            14i16
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(14i32);
+                a.set_value(15i32);
+                a.value()
+            },
+            15i32
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(15i64);
+                a.set_value(16i64);
+                a.value()
+            },
+            16i64
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(5.3f32);
+                a.set_value(4.3);
+                a.value()
+            },
+            4.3f32
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(6.4f64);
+                a.set_value(4.6f64);
+                a.value()
+            },
+            4.6f64
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(true);
+                a.set_value(false);
+                a.value()
+            },
+            false
+        );
 
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(Second::new(5));
+                a.set_value(Second::new(6));
+                a.value()
+            },
+            Second::new(6)
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(Minute::new(6));
+                a.set_value(Minute::new(7));
+                a.value()
+            },
+            Minute::new(7)
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(Date::new(2020, 2, 6));
+                a.set_value(Date::new(2020, 2, 7));
+                a.value()
+            },
+            Date::new(2020, 2, 7)
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(Month::new(8));
+                a.set_value(Month::new(9));
+                a.value()
+            },
+            Month::new(9)
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(Time::new(9));
+                a.set_value(Time::new(10));
+                a.value()
+            },
+            Time::new(10)
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(DateTime::new(10.0));
+                a.set_value(DateTime::new(11.0));
+                a.value()
+            },
+            DateTime::new(11.0)
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(Timestamp::from_raw(11));
+                a.set_value(Timestamp::from_raw(12));
+                a.value()
+            },
+            Timestamp::from_raw(12)
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(Timespan::new(12));
+                a.set_value(Timespan::new(13));
+                a.value()
+            },
+            Timespan::new(13)
+        );
+
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(symbol("Foo"));
+                a.set_value(symbol("Bar"));
+                a.value()
+            },
+            symbol("Bar")
+        );
+        assert_eq!(
+            {
+                let mut a = KBox::new_atom(Uuid::from_u128(13));
+                a.set_value(Uuid::from_u128(14));
+                a.value()
+            },
+            Uuid::from_u128(14)
+        );
+    }
     #[test]
     fn atoms_round_trip_to_any() {
         assert_eq!(

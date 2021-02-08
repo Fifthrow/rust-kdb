@@ -12,6 +12,7 @@ pub trait KValue: KType {
     const TYPE_CODE: TypeCode;
 
     unsafe fn from_k(k: &K) -> Self;
+    unsafe fn as_mutable(k: &mut K) -> &mut Self;
     fn into_k(self) -> *const K;
 }
 
@@ -65,6 +66,10 @@ mod k_type_impls {
 
                 unsafe fn from_k(k: &K) -> Self {
                     k.union.$accessor.into()
+                }
+
+                unsafe fn as_mutable(k: &mut K) -> &mut Self {
+                    (&mut k.union.$accessor).into()
                 }
 
                 fn into_k(self) -> *const K {

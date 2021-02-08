@@ -130,3 +130,5 @@ pub use serialization::*;
 pub use symbol::{symbol, Symbol};
 
 pub use array_iterator;
+#[cfg(feature = "uuid")]
+pub use uuid;

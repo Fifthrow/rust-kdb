@@ -119,6 +119,7 @@ mod table;
 mod type_traits;
 
 pub use any::Any;
+pub use array_iterator;
 pub use atom::Atom;
 pub use connection::Connection;
 pub use date_time_types::*;
@@ -131,6 +132,15 @@ pub use serialization::*;
 pub use symbol::{symbol, Symbol};
 pub use table::Table;
 
-pub use array_iterator;
+/// [not-embedded] Initialize the kdb memory subsystem. this is required when using generator functions
+/// in a standalone kdb application. This is equivalent to calling `khp("", -1)` in the C api.
+#[cfg(not(feature = "embedded"))]
+pub fn init() {
+    let empty = std::ffi::CString::new("").unwrap();
+    unsafe {
+        crate::kapi::khp(empty.as_ptr(), -1);
+    }
+}
+
 #[cfg(feature = "uuid")]
 pub use uuid;

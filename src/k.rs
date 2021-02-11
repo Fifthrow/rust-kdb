@@ -44,6 +44,14 @@ impl<'a> From<&'a mut GuidWithLen> for &'a mut uuid::Uuid {
 }
 
 #[repr(C)]
+#[derive(Clone, Copy)]
+pub struct Dict {
+    pub n: J,
+    pub k: *mut K,
+    pub v: *mut K,
+}
+
+#[repr(C)]
 pub union KUnion {
     pub c: C,
     pub g: G,
@@ -63,6 +71,7 @@ pub union KUnion {
     // it's undefined behaviour as the the underlying representation in the compiler is not defined.
     // It's worth noting that KDB uses a bit as a boolean type, but stores it in a byte. Coincidentally
     // that maps exactly to a rust bool (which *must* be either 1 or 0 else behaviour is undefined).
+    pub dict: Dict,
     pub bl: bool,
     pub sym: Symbol,
     pub ts: Timespan,

@@ -11,37 +11,20 @@ pub struct Dictionary {
 }
 
 impl Dictionary {
-    fn raw_key_value_lists(&self) -> &[KBox<List<Any>>; 2] {
-        unsafe {
-            assert_eq!(self.k.union.list.n, 2);
-            ((&self.k.union.list.g0) as *const _ as *const [KBox<List<Any>>; 2])
-                .as_ref()
-                .unwrap()
-        }
-    }
-
-    fn raw_key_value_lists_mut(&mut self) -> &mut [KBox<List<Any>>; 2] {
-        unsafe {
-            ((&self.k.union.list.g0) as *const _ as *mut [KBox<List<Any>>; 2])
-                .as_mut()
-                .unwrap()
-        }
-    }
-
     fn key_list_mut(&mut self) -> &mut KBox<List<Any>> {
-        &mut self.raw_key_value_lists_mut()[0]
+        unsafe { &mut *(&mut self.k.union.dict.k as *mut _ as *mut KBox<List<Any>>) }
     }
 
     fn value_list_mut(&mut self) -> &mut KBox<List<Any>> {
-        &mut self.raw_key_value_lists_mut()[1]
+        unsafe { &mut *(&mut self.k.union.dict.v as *mut _ as *mut KBox<List<Any>>) }
     }
 
     fn key_list(&self) -> &KBox<List<Any>> {
-        &self.raw_key_value_lists()[0]
+        unsafe { &*(&self.k.union.dict.k as *const _ as *const KBox<List<Any>>) }
     }
 
     fn value_list(&self) -> &KBox<List<Any>> {
-        &self.raw_key_value_lists()[1]
+        unsafe { &*(&self.k.union.dict.v as *const _ as *const KBox<List<Any>>) }
     }
 
     /// The number of items in the dictionary.
@@ -58,14 +41,14 @@ impl Dictionary {
 
     /// Gets a slice containing all the keys in this dictionary.
     #[inline]
-    pub fn keys(&self) -> &[Any] {
-        unsafe { mem::transmute(&self.key_list()[..]) }
+    pub fn keys(&self) -> &[KBox<Any>] {
+        &self.key_list()[..]
     }
 
     /// Gets a slice containing all the values in this dictionary.
     #[inline]
-    pub fn values(&self) -> &[Any] {
-        unsafe { mem::transmute(&self.value_list()[..]) }
+    pub fn values(&self) -> &[KBox<Any>] {
+        &self.value_list()[..]
     }
 
     /// Insert a specified key and value at the end of the dictionary.
@@ -78,20 +61,20 @@ impl Dictionary {
 
     /// Gets a value by key. Note that KDB dictionaries are treated as unordered and hence this is an O(n) operation.
     #[inline]
-    pub fn get<T: Into<KBox<Any>>>(&self, key: T) -> Option<&Any> {
+    pub fn get<T: Into<KBox<Any>>>(&self, key: T) -> Option<&KBox<Any>> {
         let key = key.into();
         let index = self
             .keys()
             .iter()
             .enumerate()
-            .find(|(_, k2)| unsafe { **k2 == *key.k })
+            .find(|(_, k2)| unsafe { *k2.k == *key.k })
             .map(|(i, _)| i)?;
         self.values().get(index)
     }
 
     /// An iterator through every value in the KDB object
     #[inline]
-    pub fn iter(&self) -> impl Iterator<Item = (&Any, &Any)> {
+    pub fn iter(&self) -> impl Iterator<Item = (&KBox<Any>, &KBox<Any>)> {
         self.keys().iter().zip(self.values().iter())
     }
 }
@@ -151,6 +134,6 @@ mod tests {
 
         let val = dict.get(symbol("Hello")).unwrap();
 
-        assert_eq!(*val, *KBox::<Any>::from(symbol("World")).as_ref());
+        assert_eq!(*val.as_ref(), *KBox::<Any>::from(symbol("World")).as_ref());
     }
 }

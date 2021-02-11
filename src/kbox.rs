@@ -9,6 +9,7 @@ use std::{fmt, ops::DerefMut};
 /// around a K pointer. It will call `r0` to decrement the reference
 /// count when it is dropped.
 #[repr(transparent)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct KBox<T: KObject> {
     pub(crate) k: *mut T,
 }

@@ -1,5 +1,6 @@
-use crate::{k::K, k_type::TABLE, type_traits::KObject};
+use crate::{k::K, type_traits::KObject};
 
+/// Represents a table (a dictionary of columns) in KDB
 #[repr(transparent)]
 pub struct Table {
     k: K,

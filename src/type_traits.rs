@@ -12,6 +12,10 @@ pub trait KValue: private::Sealed {
     fn into_k(self) -> *const K;
 }
 
+pub trait KTyped {
+    const K_TYPE: KTypeCode;
+}
+
 /// Indicates a type that wraps a `K` object. This trait is sealed and can't be implemented
 /// from other crates.
 pub trait KObject: private::Sealed {

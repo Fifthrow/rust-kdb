@@ -1,8 +1,8 @@
-use crate::date_time_types::*;
 use crate::k::K;
 use crate::kbox::KBox;
 use crate::symbol::Symbol;
 use crate::type_traits::*;
+use crate::{date_time_types::*, k_type::KTypeCode};
 use std::fmt;
 use std::marker::PhantomData;
 use std::mem;
@@ -48,6 +48,10 @@ impl<T> KObject for Atom<T> {
     fn k_ptr_mut(&mut self) -> *mut K {
         &mut self.k
     }
+}
+
+impl<T: KValue> KTyped for Atom<T> {
+    const K_TYPE: KTypeCode = T::TYPE_CODE.as_atom();
 }
 
 impl<T> private::Sealed for Atom<T> {}

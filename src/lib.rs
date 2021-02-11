@@ -118,7 +118,7 @@ mod symbol;
 mod table;
 mod type_traits;
 
-pub use any::Any;
+pub use any::{Any, KdbCast};
 pub use array_iterator;
 pub use atom::Atom;
 pub use connection::Connection;

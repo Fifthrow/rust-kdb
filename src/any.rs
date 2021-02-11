@@ -233,3 +233,65 @@ impl KListable for Any {
         kapi::jk(&mut k, mem::ManuallyDrop::new(item).k_ptr())
     }
 }
+
+#[doc(hidden)]
+pub trait KdbCast<T: Sized> {
+    type Output;
+    fn cast(self) -> Self::Output;
+}
+
+impl<T: KObject + KTyped> KdbCast<T> for KBox<Any> {
+    type Output = KBox<T>;
+    fn cast(self) -> KBox<T> {
+        unsafe {
+            if (*self.k_ptr()).t != T::K_TYPE {
+                panic!("Invalid KDB cast from {} to {}", (*self.k_ptr()).t, T::K_TYPE);
+            }
+            mem::transmute(self)
+        }
+    }
+}
+
+impl<'a, T: 'a + KObject + KTyped> KdbCast<T> for &'a KBox<Any> {
+    type Output = &'a KBox<T>;
+    fn cast(self) -> &'a KBox<T> {
+        unsafe {
+            if (*self.k_ptr()).t != T::K_TYPE {
+                panic!("Invalid KDB cast from {} to {}", (*self.k_ptr()).t, T::K_TYPE);
+            }
+            #[allow(clippy::clippy::transmute_ptr_to_ptr)]
+            mem::transmute(self)
+        }
+    }
+}
+
+impl<'a, T: 'a + KObject + KTyped> KdbCast<T> for &'a Any {
+    type Output = &'a T;
+    fn cast(self) -> &'a T {
+        unsafe {
+            if (*self.k_ptr()).t != T::K_TYPE {
+                panic!("Invalid KDB cast from {} to {}", (*self.k_ptr()).t, T::K_TYPE);
+            }
+            #[allow(clippy::clippy::transmute_ptr_to_ptr)]
+            mem::transmute(self)
+        }
+    }
+}
+
+/// Cast a KBox<Any>, &KBox<Any> or &Any to another KDB type.
+///
+/// If the KDB type is anything other than the expected one, the cast will panic.
+///
+/// # Example
+///
+/// ```
+/// # use kdb::{cast, symbol, Any, Atom, KBox, Symbol};
+/// let a: KBox<Any> = symbol("Hello").into();
+/// assert_eq!(symbol("Hello"), cast!(a; Atom<Symbol>).value());
+/// ```
+#[macro_export]
+macro_rules! cast {
+    ($ex:expr; $t:ty) => {
+        kdb::KdbCast::<$t>::cast($ex)
+    };
+}

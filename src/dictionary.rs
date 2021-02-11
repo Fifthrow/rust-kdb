@@ -1,7 +1,11 @@
-use crate::kbox::KBox;
 use crate::list::List;
 use crate::{any::Any, k::K};
 use crate::{k_type::MIXED_LIST, kapi, type_traits::KObject};
+use crate::{
+    k_type::{KTypeCode, DICT},
+    kbox::KBox,
+    type_traits::KTyped,
+};
 use std::{mem, ops::Index};
 
 /// A key value based dictionary.
@@ -100,6 +104,10 @@ impl KObject for Dictionary {
     fn k_ptr_mut(&mut self) -> *mut K {
         &mut self.k
     }
+}
+
+impl KTyped for Dictionary {
+    const K_TYPE: KTypeCode = DICT;
 }
 
 impl KBox<Dictionary> {

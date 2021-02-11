@@ -1,7 +1,7 @@
-use crate::kapi;
 use crate::kbox::KBox;
 use crate::type_traits::*;
 use crate::{k::K, ConversionError};
+use crate::{k_type::KTypeCode, kapi};
 use std::ops;
 use std::slice;
 use std::{marker::PhantomData, slice::SliceIndex};
@@ -129,6 +129,10 @@ impl<T: KListable> KBox<List<T>> {
             self.k = T::join_to(item, self.k as *mut K) as *mut List<T>;
         }
     }
+}
+
+impl<T: KListable> KTyped for List<T> {
+    const K_TYPE: KTypeCode = T::LIST_TYPE_CODE;
 }
 
 impl List<i8> {

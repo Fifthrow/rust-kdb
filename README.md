@@ -25,7 +25,5 @@ To use the library in an embedded context, compile with the the _embedded_ featu
 # Future plans
 
 1. Table support!
-2. There are a few API calls's that aren't supported yet, notably (de)serialization.
-3. There are a couple of places where the API is not very clean, for example working with mixed lists. We are looking at providing nicer mechanisms to work with them.
-4. Add better integration between chrono/std::time and the KDB time types.
-5. Round out some of the edge cases and ensure it's fully sound.
+2. There are a few API calls's that aren't supported yet.
+3. Add better integration between chrono/std::time and the KDB time types.

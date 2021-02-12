@@ -1,9 +1,13 @@
 extern crate kdb;
 
-use kdb::KByteAtom;
+use kdb::KBox;
 
 fn main() {
-    let k: KByteAtom = 42.into();
+    let mut k = KBox::new_atom(42u8);
+    println!("{}", k);
+    assert_eq!(k.value(), 42);
 
-    println!("{}", *k);
+    k.set_value(43);
+
+    assert_eq!(k.value(), 43);
 }

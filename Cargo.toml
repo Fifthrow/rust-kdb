@@ -1,6 +1,6 @@
 [package]
 name = "kdb"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Fifth Row Technologies"]
 edition = "2018"
 description = "Idiomatic, High performance API for using KDB+ and Q from Rust"
@@ -8,7 +8,6 @@ readme = "README.md"
 license = "MIT"
 keywords = ["kdb", "q"]
 categories = ["api-bindings", "database"]
-maintenance = { status = "actively-developed" }
 repository = "https://github.com/Fifthrow/rust-kdb"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

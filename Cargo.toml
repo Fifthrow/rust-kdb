@@ -1,6 +1,6 @@
 [package]
 name = "kdb"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Fifth Row Technologies"]
 edition = "2018"
 description = "Idiomatic, High performance API for using KDB+ and Q from Rust"

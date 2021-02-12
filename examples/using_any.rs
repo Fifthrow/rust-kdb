@@ -1,5 +1,5 @@
-use kdb::{Any, Atom, KBox};
-use std::convert::TryFrom; // <-- this trait is your best friend when you use this crate
+use kdb::{cast, Any, Atom, KBox};
+use std::convert::TryFrom;
 
 fn main() {
     let int = KBox::new_atom(42);
@@ -7,8 +7,8 @@ fn main() {
     // convert to an "any" value:
     let any: KBox<Any> = int.into();
 
-    // try to convert back to an i32 atom.
-    let int = KBox::<Atom<i32>>::try_from(any).unwrap();
+    // convert back to an i32 atom.
+    let int = cast!(any; Atom<i32>);
     println!("{:?}", int);
 
     let any: KBox<Any> = int.into();

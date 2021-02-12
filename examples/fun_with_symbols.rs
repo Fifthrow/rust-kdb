@@ -14,11 +14,8 @@ fn main() {
 
     assert_eq!(atom.value(), atom_2.value());
 
-    // We cannot directly display a KDB symbol as, unlike like rust strings, they do not have to be
-    // Utf8 encoded.
-    println!("{}", sym.try_as_str().unwrap());
-
-    //As a compromise we can use debug, which will attempt to display it or display
-    // <invalid rust string> if it is invalid.
-    println!("{:?}", sym);
+    // Note that because rust strings are utf-8, and symbols have no encoding requirement,
+    // this may not display the same way as you will see it in kdb, especially if the string is
+    // not a valid ASCII or utf-8 string.
+    println!("{}", sym);
 }

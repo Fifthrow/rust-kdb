@@ -7,4 +7,5 @@ fn main() {
     if let Err(err) = conn.publish("upd", symbol("some_topic"), l) {
         println!("Publishing failed: {}", err);
     }
+    println!("Publish succeeded! Probably.");
 }

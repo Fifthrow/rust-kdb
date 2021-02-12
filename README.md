@@ -1,4 +1,4 @@
-#Rust KDB
+# Rust KDB
 
 rust-kdb is an idiomatic Rust wrapper around the C API for KDB+, the ultra fast time series database from KX Systems.
 
@@ -16,7 +16,7 @@ rust-kdb is an idiomatic Rust wrapper around the C API for KDB+, the ultra fast 
 Check out the examples for more information on using it. Performance should be extremely good -
 there is little to no overhead over and above using the API directly.
 
-# Compilation
+## Compilation
 
 In order to build the library or run the tests or any of the examples, you'll need to have libkdb.a available somewhere in LIBRARY_PATH. If you'd rather not use library path, you can set the variable LKDB_LIB_DIR instead.
 
@@ -24,7 +24,7 @@ In order to build the library or run the tests or any of the examples, you'll ne
 
 To use the library in an embedded context, compile with the the _embedded_ feature. Make sure that you are compiling with the right architecture, and linking to the right version of libkdb.a for that architecture (either the 32-bit or 64-bit edition).
 
-# Future plans
+## Future plans
 
 1. Table support!
 2. There are a few API calls's that aren't supported yet.

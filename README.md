@@ -1,15 +1,17 @@
+#Rust KDB
+
+rust-kdb is an idiomatic Rust wrapper around the C API for KDB+, the ultra fast time series database from KX Systems.
+
 [![Docs.rs][docs-badge]][docs-url]
 [![Crates.io][crates-badge]][crates-url]
 [![MIT licensed][mit-badge]][mit-url]
 
-[docs-badge]: https://docs.rs/kdb/badge.svg?version=0.2.1)
+[docs-badge]: https://docs.rs/kdb/badge.svg
 [docs-url]: https://docs.rs/kdb
 [crates-badge]: https://img.shields.io/crates/v/kdb.svg
 [crates-url]: https://crates.io/crates/kdb
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [mit-url]: LICENSE
-
-rust-kdb is an idiomatic Rust wrapper around the C API for KDB+, the ultra fast time series database from KX Systems.
 
 Check out the examples for more information on using it. Performance should be extremely good -
 there is little to no overhead over and above using the API directly.

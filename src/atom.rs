@@ -151,7 +151,10 @@ mod tests {
         assert_eq!(KBox::new_atom(Time::new(9)).value(), Time::new(9));
         assert_eq!(KBox::new_atom(DateTime::new(10.0)).value(), DateTime::new(10.0));
         assert_eq!(KBox::new_atom(Timestamp::from_raw(11)).value(), Timestamp::from_raw(11));
-        assert_eq!(KBox::new_atom(Timespan::new(12)).value(), Timespan::new(12));
+        assert_eq!(
+            KBox::new_atom(Timespan::from_nanos(12)).value(),
+            Timespan::from_nanos(12)
+        );
 
         assert_eq!(KBox::new_atom(symbol("Foo")).value(), symbol("Foo"));
         #[cfg(feature = "uuid")]
@@ -285,11 +288,11 @@ mod tests {
         );
         assert_eq!(
             {
-                let mut a = KBox::new_atom(Timespan::new(12));
-                a.set_value(Timespan::new(13));
+                let mut a = KBox::new_atom(Timespan::from_nanos(12));
+                a.set_value(Timespan::from_nanos(13));
                 a.value()
             },
-            Timespan::new(13)
+            Timespan::from_nanos(13)
         );
 
         assert_eq!(
@@ -397,10 +400,10 @@ mod tests {
             Timestamp::from_raw(11)
         );
         assert_eq!(
-            KBox::<Atom<Timespan>>::try_from(KBox::<Any>::from(KBox::new_atom(Timespan::new(12))))
+            KBox::<Atom<Timespan>>::try_from(KBox::<Any>::from(KBox::new_atom(Timespan::from_nanos(12))))
                 .unwrap()
                 .value(),
-            Timespan::new(12)
+            Timespan::from_nanos(12)
         );
 
         assert_eq!(

@@ -89,6 +89,11 @@ impl Date {
     pub fn new(year: i32, month: i32, day: i32) -> Self {
         Date(unsafe { kapi::ymd(year, month, day) })
     }
+
+    /// Returns the date as the number of days since 1 Jan 2000.
+    pub fn as_raw(&self) -> i32 {
+        self.0
+    }
 }
 
 impl From<i32> for Date {
@@ -219,7 +224,7 @@ impl Timestamp {
     }
 
     /// Converts the timestamp to the number of nanoseconds from the unix epoch and returns it.
-    pub fn to_nanos_unix(&self) -> u64 {
+    pub fn as_nanos_unix(&self) -> u64 {
         (self.0 + K_NANO_OFFSET) as u64
     }
 
@@ -236,7 +241,7 @@ impl Timestamp {
 
 impl From<Timestamp> for SystemTime {
     fn from(date: Timestamp) -> SystemTime {
-        SystemTime::UNIX_EPOCH + Duration::from_nanos(date.to_nanos_unix())
+        SystemTime::UNIX_EPOCH + Duration::from_nanos(date.as_nanos_unix())
     }
 }
 
@@ -259,15 +264,34 @@ impl From<Timestamp> for i64 {
     }
 }
 
-/// Represents the number of nanoseconds since midnight.
+/// Represents an elapsed span of time
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Timespan(i64);
 
 impl Timespan {
     /// Creates a Timespan from the specified number of nanoseconds.
-    pub fn new(nanos_since_midnight: i64) -> Self {
-        Timespan(nanos_since_midnight)
+    #[inline]
+    pub fn from_nanos(nanos: i64) -> Self {
+        Timespan(nanos)
+    }
+
+    /// Creates a Timespan from the specified number of microseconds.
+    #[inline]
+    pub fn from_micros(micros: i64) -> Self {
+        Timespan(1_000 * micros)
+    }
+
+    /// Creates a Timespan from the specified number of milliseconds.
+    #[inline]
+    pub fn from_millis(millis: i64) -> Self {
+        Timespan(1_000_000 * millis)
+    }
+
+    /// Creates a Timespan from the specified number of seconds.
+    #[inline]
+    pub fn from_secs(millis: i64) -> Self {
+        Timespan(1_000_000_000 * millis)
     }
 }
 

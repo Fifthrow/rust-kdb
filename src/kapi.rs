@@ -81,7 +81,7 @@ extern "C" {
     pub fn r0(k: *mut K) -> V;
     pub fn r1(k: *mut K) -> *mut K;
 
-    pub fn sd1(d: I, cb: Option<KCallback>) -> *const K;
+    pub fn sd1(d: I, cb: Option<KCallback>) -> *mut K;
     pub fn sd0(d: I) -> V;
     pub fn sd0x(d: I, f: I) -> V;
     pub fn setm(m: I) -> I;

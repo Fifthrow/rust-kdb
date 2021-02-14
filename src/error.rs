@@ -47,6 +47,9 @@ pub enum Error {
     /// Network error accessing remote KDB instance.
     #[error("Network error")]
     NetworkError,
+    /// Error setting callback using sd1
+    #[error("Error setting callback")]
+    Callback,
     /// Custom error from query.
     #[error("Query failed: {0}")]
     QError(String),

@@ -103,6 +103,7 @@
 
 mod any;
 mod atom;
+mod callbacks;
 mod connection;
 mod date_time_types;
 mod dictionary;
@@ -121,6 +122,7 @@ mod type_traits;
 pub use any::{Any, KdbCast};
 pub use array_iterator;
 pub use atom::Atom;
+pub use callbacks::*;
 pub use connection::Connection;
 pub use date_time_types::*;
 pub use dictionary::Dictionary;

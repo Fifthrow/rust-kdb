@@ -1,11 +1,11 @@
-use crate::kbox::KBox;
-use crate::list::List;
 use crate::type_traits::*;
 use crate::{atom::Atom, k_type::DICT};
 use crate::{error::ConversionError, Dictionary};
 use crate::{k::K, Table};
 use crate::{k_type::KTypeCode, k_type::MIXED_LIST};
+use crate::{k_type::ERROR, kbox::KBox};
 use crate::{k_type::TABLE, kapi};
+use crate::{list::List, KError};
 use std::convert::TryFrom;
 use std::fmt;
 use std::mem;
@@ -45,6 +45,12 @@ impl AsRef<Any> for Dictionary {
 }
 
 impl AsRef<Any> for Table {
+    fn as_ref(&self) -> &Any {
+        unsafe { &*(self as *const _ as *const _) }
+    }
+}
+
+impl AsRef<Any> for KError {
     fn as_ref(&self) -> &Any {
         unsafe { &*(self as *const _ as *const _) }
     }

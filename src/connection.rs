@@ -4,7 +4,7 @@
 //! If you are using it externally, the call connect, which takes a host, port, credentials and an optional timeout.
 
 use crate::any::Any;
-use crate::error::{ConnectionError, Error};
+use crate::error::*;
 use crate::k::K;
 use crate::k_error::KError;
 use crate::k_type::ERROR;

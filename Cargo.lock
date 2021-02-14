@@ -8,7 +8,7 @@ checksum = "163c3f9e62eea089971c2b15cbd1e13f7c667f9911d3e2d5a1b418a2316859ec"
 
 [[package]]
 name = "kdb"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "array_iterator",
  "thiserror",

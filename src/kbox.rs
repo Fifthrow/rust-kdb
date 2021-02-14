@@ -2,6 +2,7 @@ use crate::type_traits::KObject;
 use crate::{k::K, kapi};
 use std::mem::ManuallyDrop;
 use std::ops::Deref;
+use std::ptr::NonNull;
 use std::{fmt, ops::DerefMut};
 
 /// Represents a memory managed K pointer. They are the
@@ -11,7 +12,7 @@ use std::{fmt, ops::DerefMut};
 #[repr(transparent)]
 #[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct KBox<T: KObject> {
-    pub(crate) k: *mut T,
+    pub(crate) k: NonNull<T>,
 }
 
 impl<T: KObject> KBox<T> {
@@ -19,7 +20,7 @@ impl<T: KObject> KBox<T> {
     /// Note that into raw will consume the KBox, and not call
     /// r0, so it's possible to leak memory by doing this.
     pub fn into_raw(self) -> *mut T {
-        ManuallyDrop::new(self).k
+        ManuallyDrop::new(self).k.as_ptr()
     }
 
     /// Converts a raw K pointer into a boxed K object.
@@ -28,10 +29,14 @@ impl<T: KObject> KBox<T> {
     /// # Safety
     ///
     /// The type of the k pointer must match the type of the KBox being used.
+    /// The pointer must not be null.
+    ///
     /// Do not use this to take ownership of a kdb callback function parameter,
     /// use from_shared instead.
     pub unsafe fn from_raw(k: *mut K) -> Self {
-        KBox { k: k as *mut T }
+        KBox {
+            k: NonNull::new_unchecked(k as *mut T),
+        }
     }
 
     /// Takes a reference and calls r1, incrementing the reference count
@@ -47,7 +52,7 @@ impl<T: KObject> KBox<T> {
     /// A reference should not be owned by more than one `KBox` instance.
     pub unsafe fn from_shared(t: &mut T) -> Self {
         KBox {
-            k: kapi::r1(t.k_ptr_mut()) as *mut T,
+            k: NonNull::new_unchecked(kapi::r1(t.k_ptr_mut()) as *mut T),
         }
     }
 }
@@ -55,7 +60,7 @@ impl<T: KObject> KBox<T> {
 impl<T: KObject> Drop for KBox<T> {
     fn drop(&mut self) {
         unsafe {
-            kapi::r0((*self.k).k_ptr_mut());
+            kapi::r0(self.k.as_mut().k_ptr_mut());
         }
     }
 }
@@ -64,19 +69,19 @@ impl<T: KObject> Deref for KBox<T> {
     type Target = T;
 
     fn deref(&self) -> &T {
-        unsafe { &*self.k }
+        unsafe { self.k.as_ref() }
     }
 }
 
 impl<T: KObject> DerefMut for KBox<T> {
     fn deref_mut(&mut self) -> &mut T {
-        unsafe { &mut *self.k }
+        unsafe { self.k.as_mut() }
     }
 }
 
 impl<T: KObject> AsRef<T> for KBox<T> {
     fn as_ref(&self) -> &T {
-        unsafe { &*self.k }
+        unsafe { self.k.as_ref() }
     }
 }
 

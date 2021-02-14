@@ -3,9 +3,9 @@ use crate::kbox::KBox;
 use crate::symbol::Symbol;
 use crate::type_traits::*;
 use crate::{date_time_types::*, k_type::KTypeCode};
-use std::fmt;
 use std::marker::PhantomData;
 use std::mem;
+use std::{fmt, ptr::NonNull};
 
 /// Atoms are the base primitive values in rust-kdb. You can create a new atom by calling
 /// `KBox::new_atom`, or using the `From`/`Into` traits on a value.
@@ -72,7 +72,7 @@ impl<T: KValue> From<T> for KBox<Atom<T>> {
     #[inline]
     fn from(val: T) -> KBox<Atom<T>> {
         KBox {
-            k: val.into_k() as *mut K as *mut Atom<T>,
+            k: unsafe { NonNull::new_unchecked(val.into_k() as *mut K as *mut Atom<T>) },
         }
     }
 }

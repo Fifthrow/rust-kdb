@@ -85,7 +85,7 @@
 //! /// Calculates the circumference of a circle. Returns a null value if the radius is not a real number.
 //! #[no_mangle]
 //! pub extern "C" fn circumference(radius: &Any) -> Option<KBox<Atom<f64>>> {
-//!     if let Ok(r) = <&Atom<f64>>::try_from(radius) {
+//!     if let Ok(r) = try_cast!(radius; Atom<f64>) {
 //!         return Some(KBox::new_atom(r.value() * r.value() * PI));
 //!     }
 //!     None

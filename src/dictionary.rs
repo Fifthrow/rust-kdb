@@ -71,7 +71,7 @@ impl Dictionary {
             .keys()
             .iter()
             .enumerate()
-            .find(|(_, k2)| unsafe { *k2.k == *key.k })
+            .find(|(_, k2)| unsafe { *k2.k.as_ptr() == *key.k.as_ptr() })
             .map(|(i, _)| i)?;
         self.values().get(index)
     }

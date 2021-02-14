@@ -2,10 +2,10 @@ use crate::kbox::KBox;
 use crate::type_traits::*;
 use crate::{k::K, ConversionError};
 use crate::{k_type::KTypeCode, kapi};
-use std::ops;
 use std::slice;
 use std::{marker::PhantomData, slice::SliceIndex};
 use std::{mem, str};
+use std::{ops, ptr::NonNull};
 
 use std::{
     iter::FromIterator,
@@ -119,14 +119,18 @@ impl<T: KListable> KBox<List<T>> {
     /// Appends a list to this one, consuming it and adding it's elements to the new one.
     #[inline]
     pub fn join(&mut self, list: KBox<List<T>>) {
-        unsafe { self.k = kapi::jv(&mut (self.k as *mut K), list.into_raw() as *const K) as *mut K as *mut List<T> }
+        unsafe {
+            self.k = NonNull::new_unchecked(
+                kapi::jv(&mut (self.k.as_ptr() as *mut K), list.into_raw() as *const K) as *mut K as *mut List<T>
+            )
+        }
     }
 
     /// Appends an element to the end of the list.
     #[inline]
     pub fn push(&mut self, item: T::ListItem) {
         unsafe {
-            self.k = T::join_to(item, self.k as *mut K) as *mut List<T>;
+            self.k = NonNull::new_unchecked(T::join_to(item, self.k.as_ptr() as *mut K) as *mut List<T>);
         }
     }
 }

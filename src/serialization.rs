@@ -41,29 +41,27 @@ pub fn d9_deserialize(k: impl AsRef<List<u8>>) -> Result<KBox<Any>, KBox<KError>
 
 #[cfg(test)]
 mod tests {
-    use std::convert::TryInto;
-
     use super::*;
-    use crate::list;
+    use crate::{cast, list};
 
     #[test]
     fn b9_d9_roundtrips() {
         let l = list![i32; 1, 2, 3];
 
         let bytes = b9_serialize(SerializationMode::InProc, l.as_ref()).unwrap();
-        let v: KBox<List<i32>> = d9_deserialize(bytes).unwrap().try_into().unwrap();
+        let v = cast!(d9_deserialize(bytes).unwrap(); List<i32>);
         assert_eq!(v.as_slice(), &[1, 2, 3]);
 
         let bytes = b9_serialize(SerializationMode::Enumerate, l.as_ref()).unwrap();
-        let v: KBox<List<i32>> = d9_deserialize(bytes).unwrap().try_into().unwrap();
+        let v = cast!(d9_deserialize(bytes).unwrap(); List<i32>);
         assert_eq!(v.as_slice(), &[1, 2, 3]);
 
         let bytes = b9_serialize(SerializationMode::Unenumerate, l.as_ref()).unwrap();
-        let v: KBox<List<i32>> = d9_deserialize(bytes).unwrap().try_into().unwrap();
+        let v = cast!(d9_deserialize(bytes).unwrap(); List<i32>);
         assert_eq!(v.as_slice(), &[1, 2, 3]);
 
         let bytes = b9_serialize(SerializationMode::Compress, l.as_ref()).unwrap();
-        let v: KBox<List<i32>> = d9_deserialize(bytes).unwrap().try_into().unwrap();
+        let v = cast!(d9_deserialize(bytes).unwrap(); List<i32>);
         assert_eq!(v.as_slice(), &[1, 2, 3]);
     }
 }

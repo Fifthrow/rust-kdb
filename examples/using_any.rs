@@ -1,5 +1,4 @@
-use kdb::{cast, Any, Atom, KBox};
-use std::convert::TryFrom;
+use kdb::{cast, try_cast, Any, Atom, KBox};
 
 fn main() {
     let int = KBox::new_atom(42);
@@ -13,7 +12,7 @@ fn main() {
 
     let any: KBox<Any> = int.into();
     // try to convert to a u8 atom. This will fail!
-    if let Err(e) = KBox::<Atom<u8>>::try_from(any) {
+    if let Err(e) = try_cast!(any; Atom<u8>) {
         println!("Error: {}", e);
     }
 }

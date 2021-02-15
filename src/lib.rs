@@ -59,15 +59,14 @@
 //!
 //! The `Any` type can be used in place of any valid KDB value (atom or list).
 //! You can't do much with it, except try to convert it to a different type, using
-//! the `TryFrom`/`TryInto` traits.
+//! the `cast!` and `try_cast!` macros.
 //!
 //! ```
-//! use kdb::*;
-//! use std::convert::{TryFrom, TryInto};
+//! use kdb::{cast, Any, Atom, KBox};
 //!
 //! let a = KBox::new_atom(42);
 //! let b: KBox<Any> = a.into();
-//! let c: KBox<Atom<i32>> = b.try_into().unwrap();
+//! let c = cast!(b; Atom<i32>);
 //! ```
 //!
 //! # Writing embedded KDB plug-ins

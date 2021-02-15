@@ -130,9 +130,8 @@ mod tests {
     #![allow(clippy::clippy::float_cmp)]
 
     use super::*;
-    use crate::any::Any;
     use crate::symbol::symbol;
-    use std::convert::TryFrom;
+    use crate::{cast, Any};
 
     #[test]
     fn value_returns_underlying_value() {
@@ -314,109 +313,77 @@ mod tests {
     }
     #[test]
     fn atoms_round_trip_to_any() {
+        assert_eq!(cast!(KBox::<Any>::from(KBox::new_atom(12u8)); Atom<u8>).value(), 12u8);
         assert_eq!(
-            KBox::<Atom<u8>>::try_from(KBox::<Any>::from(KBox::new_atom(12u8)))
-                .unwrap()
-                .value(),
-            12u8
-        );
-        assert_eq!(
-            KBox::<Atom<i16>>::try_from(KBox::<Any>::from(KBox::new_atom(13i16)))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(13i16)); Atom<i16>).value(),
             13i16
         );
         assert_eq!(
-            KBox::<Atom<i32>>::try_from(KBox::<Any>::from(KBox::new_atom(14i32)))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(14i32)); Atom<i32>).value(),
             14i32
         );
         assert_eq!(
-            KBox::<Atom<i64>>::try_from(KBox::<Any>::from(KBox::new_atom(15i64)))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(15i64)); Atom<i64>).value(),
             15i64
         );
         assert_eq!(
-            KBox::<Atom<f32>>::try_from(KBox::<Any>::from(KBox::new_atom(5.3f32)))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(5.3f32)); Atom<f32>).value(),
             5.3f32
         );
+        assert_eq!(cast!(KBox::<Any>::from(KBox::new_atom(true)); Atom<bool>).value(), true);
         assert_eq!(
-            KBox::<Atom<bool>>::try_from(KBox::<Any>::from(KBox::new_atom(true)))
-                .unwrap()
-                .value(),
-            true
-        );
-        assert_eq!(
-            KBox::<Atom<f64>>::try_from(KBox::<Any>::from(KBox::new_atom(6.4f64)))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(6.4f64)); Atom<f64>).value(),
             6.4f64
         );
 
         assert_eq!(
-            KBox::<Atom<Second>>::try_from(KBox::<Any>::from(KBox::new_atom(Second::new(5))))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(Second::new(5))); Atom<Second>).value(),
             Second::new(5)
         );
         assert_eq!(
-            KBox::<Atom<Minute>>::try_from(KBox::<Any>::from(KBox::new_atom(Minute::new(6))))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(Minute::new(6))); Atom<Minute>).value(),
             Minute::new(6)
         );
         assert_eq!(
-            KBox::<Atom<Date>>::try_from(KBox::<Any>::from(KBox::new_atom(Date::new(2020, 2, 6))))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(Date::new(2020, 2, 6))); Atom<Date>).value(),
             Date::new(2020, 2, 6)
         );
         assert_eq!(
-            KBox::<Atom<Month>>::try_from(KBox::<Any>::from(KBox::new_atom(Month::new(8))))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(Month::new(8))); Atom<Month>).value(),
             Month::new(8)
         );
         assert_eq!(
-            KBox::<Atom<Time>>::try_from(KBox::<Any>::from(KBox::new_atom(Time::new(9))))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(Time::new(9))); Atom<Time>).value(),
             Time::new(9)
         );
         assert_eq!(
-            KBox::<Atom<DateTime>>::try_from(KBox::<Any>::from(KBox::new_atom(DateTime::new(10.0))))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(DateTime::new(10.0))); Atom<DateTime>).value(),
             DateTime::new(10.0)
         );
         assert_eq!(
-            KBox::<Atom<Timestamp>>::try_from(KBox::<Any>::from(KBox::new_atom(Timestamp::from_raw(11))))
-                .unwrap()
-                .value(),
+            cast!(
+                KBox::<Any>::from(KBox::new_atom(Timestamp::from_raw(11)));
+                Atom<Timestamp>
+            )
+            .value(),
             Timestamp::from_raw(11)
         );
         assert_eq!(
-            KBox::<Atom<Timespan>>::try_from(KBox::<Any>::from(KBox::new_atom(Timespan::from_nanos(12))))
-                .unwrap()
-                .value(),
+            cast!(
+                KBox::<Any>::from(KBox::new_atom(Timespan::from_nanos(12)));
+                Atom<Timespan>
+            )
+            .value(),
             Timespan::from_nanos(12)
         );
 
         assert_eq!(
-            KBox::<Atom<Symbol>>::try_from(KBox::<Any>::from(KBox::new_atom(symbol("Foo"))))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(symbol("Foo"))); Atom<Symbol>).value(),
             symbol("Foo")
         );
         #[cfg(feature = "uuid")]
         assert_eq!(
-            KBox::<Atom<uuid::Uuid>>::try_from(KBox::<Any>::from(KBox::new_atom(uuid::Uuid::from_bytes([12u8; 16]))))
-                .unwrap()
-                .value(),
+            cast!(KBox::<Any>::from(KBox::new_atom(uuid::Uuid::from_bytes([12u8; 16]))); Atom<uuid::Uuid>).value(),
             uuid::Uuid::from_bytes([12u8; 16])
         );
     }

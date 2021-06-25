@@ -87,12 +87,12 @@ impl<T: KObject> AsRef<T> for KBox<T> {
 
 impl<T: KObject + fmt::Debug> fmt::Debug for KBox<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "KBox({:?})", *self)
+        write!(f, "KBox({:?})", self.as_ref())
     }
 }
 
 impl<T: KObject + fmt::Display> fmt::Display for KBox<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", *self)
+        write!(f, "{}", self.as_ref())
     }
 }

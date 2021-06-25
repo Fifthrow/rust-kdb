@@ -103,6 +103,30 @@ impl KObject for Any {
     }
 }
 
+impl<T: KListable> AsRef<Any> for KBox<List<T>> {
+    fn as_ref(&self) -> &Any {
+        unsafe { &*(self as *const _ as *const _) }
+    }
+}
+
+impl<T: KValue> AsRef<Any> for KBox<Atom<T>> {
+    fn as_ref(&self) -> &Any {
+        unsafe { &*(self as *const _ as *const _) }
+    }
+}
+
+impl AsRef<Any> for KBox<Dictionary> {
+    fn as_ref(&self) -> &Any {
+        unsafe { &*(self as *const _ as *const _) }
+    }
+}
+
+impl AsRef<Any> for KBox<Table> {
+    fn as_ref(&self) -> &Any {
+        unsafe { &*(self as *const _ as *const _) }
+    }
+}
+
 impl KListable for Any {
     const LIST_TYPE_CODE: KTypeCode = MIXED_LIST;
     type ListItem = KBox<Any>;
